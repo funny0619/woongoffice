@@ -1,0 +1,128 @@
+body {
+  background-color: #FFF8F2;
+}
+
+.header {
+  background-color: #FFF8F2;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  font-size: 30px;
+}
+
+.office-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.office-card-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.office-card {
+  width: 45%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 10px;
+  margin: 20px 20px;
+  /* Increased horizontal margin for more space between cards in the same row */
+  padding: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.office-card-name {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Spin Wheel Styles */
+.spin-wheel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px auto;
+  max-width: 600px;
+}
+
+.wheel-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 20px 0;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  transition: transform 5s ease-out;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.wheel-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  width: 50%;
+  height: 30px;
+  line-height: 30px;
+  text-align: right;
+  padding-right: 25px;
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 30px solid #ff5252;
+  z-index: 10;
+}
+
+.spin-wheel-container button {
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 15px 0;
+  transition: background-color 0.3s;
+}
+
+.spin-wheel-container button:hover {
+  background-color: #ff3333;
+}
+
+.spin-wheel-container button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.result {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 15px;
+  color: #ff5252;
+}
