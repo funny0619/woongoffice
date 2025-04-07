@@ -17,8 +17,7 @@
     </div>
     <div class="office-card-container">
       <office-card name="Food" image="./assets/images/calendar.png" @click="navigateTo('food')"></office-card>
-      <office-card name="Documents" image="./assets/images/documents.png"
-        @click="navigateTo('documents')"></office-card>
+      <office-card name="Documents" image="./assets/images/documents.png" @click="navigateTo('todo')"></office-card>
       <office-card name="Mail" image="./assets/images/mail.png" @click="navigateTo('mail')"></office-card>
       <office-card name="Photos" image="./assets/images/photos.png" @click="navigateTo('photos')"></office-card>
     </div>
@@ -42,8 +41,8 @@
         case 'food':
           window.location.href = './food.html';
           break;
-        case 'documents':
-          window.location.href = './documents.html';
+        case 'todo':
+          window.location.href = './todo.html';
           break;
         case 'mail':
           window.location.href = './mail.html';
