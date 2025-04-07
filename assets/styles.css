@@ -69,13 +69,19 @@ body {
   padding: 10px;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  transition: all 0.1s ease;
   aspect-ratio: 1;
-  /* Make cells square */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+.grid-cell.highlighted {
+  background-color: #4CAF50;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .grid-cell span {
@@ -104,4 +110,17 @@ button {
 
 button:hover {
   background-color: #45a049;
+}
+
+.result {
+  margin-top: 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #4CAF50;
+  text-align: center;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
