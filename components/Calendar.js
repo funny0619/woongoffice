@@ -3,22 +3,28 @@ app.component('calendar', {
         /*html*/
         `
         <div class="calendar-container">
-            <div class="countdown-grid">
-                <h2>Upcoming Special Dates</h2>
-                <div class="countdown-cards">
-                    <div v-for="(event, index) in sortedSpecialDates" :key="index" class="countdown-card">
-                        <h3>{{ event.name }}</h3>
-                        <p class="days-remaining">{{ event.daysRemaining }} days</p>
-                        <p class="event-date">{{ formatDate(event.date) }}</p>
+            <div class="countdown-grid mb-4">
+                <h2 class="title is-5 has-text-centered mb-3">Upcoming Special Dates</h2>
+                <div class="columns is-mobile is-multiline">
+                    <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
+                        <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div class="card-content p-2">
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+                                    <span class="title is-6 mb-0">{{ event.name }}</span>
+                                    <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }} days</span>
+                                </div>
+                                <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="interactive-calendar">
-                <div class="calendar-header">
-                    <button @click="previousMonth" class="nav-button">&lt;</button>
-                    <h2>{{ currentMonthName }} {{ currentYear }}</h2>
-                    <button @click="nextMonth" class="nav-button">&gt;</button>
+                <div class="calendar-header is-flex is-justify-content-space-between is-align-items-center mb-3">
+                    <button @click="previousMonth" class="button is-small is-light">&lt;</button>
+                    <h2 class="title is-5">{{ currentMonthName }} {{ currentYear }}</h2>
+                    <button @click="nextMonth" class="button is-small is-light">&gt;</button>
                 </div>
                 <div class="calendar-grid">
                     <div class="weekday-header" v-for="day in weekDays" :key="day">{{ day }}</div>

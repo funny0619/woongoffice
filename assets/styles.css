@@ -345,18 +345,18 @@ button:disabled {
 
 .countdown-grid {
   background: white;
-  border-radius: 15px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
   margin: 0 auto;
 }
 
 .countdown-grid h2 {
   color: #4CAF50;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   text-align: center;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 
 .countdown-cards {
@@ -367,34 +367,52 @@ button:disabled {
 
 .countdown-card {
   background: #FFF8F2;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 8px;
   text-align: center;
   transition: transform 0.3s ease;
-  min-width: 150px;
-  max-width: 180px;
+  min-width: 120px;
+  max-width: 150px;
 }
 
 .countdown-card:hover {
   transform: translateY(-3px);
 }
 
-.countdown-card h3 {
-  color: #333;
-  margin-bottom: 5px;
-  font-size: 0.9em;
+.countdown-card .card-content {
+  padding: 0.5rem !important;
+}
+
+.countdown-card .title {
+  margin-bottom: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+
+.countdown-card .subtitle {
+  margin-bottom: 0 !important;
+  white-space: nowrap;
+}
+
+.countdown-card .has-text-grey {
+  margin-top: 0.25rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .days-remaining {
-  font-size: 1.2em;
+  font-size: 1em;
   color: #4CAF50;
   font-weight: bold;
-  margin: 5px 0;
+  margin: 4px 0;
 }
 
 .event-date {
   color: #666;
-  font-size: 0.8em;
+  font-size: 0.75em;
 }
 
 .interactive-calendar {
@@ -437,14 +455,18 @@ button:disabled {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 4px;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
 .weekday-header {
   text-align: center;
   font-weight: bold;
-  color: #666;
-  padding: 10px;
+  padding: 8px 0;
+  font-size: 0.8rem;
 }
 
 .calendar-day {
@@ -452,35 +474,87 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  border-radius: 50%;
   position: relative;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .calendar-day:hover {
-  background-color: #FFF8F2;
+  background-color: #f5f5f5;
 }
 
 .calendar-day.today {
-  background-color: #4CAF50;
-  color: white;
+  background-color: #e3f2fd;
+  font-weight: bold;
 }
 
 .calendar-day.selected {
-  background-color: #FFF8F2;
-  border: 2px solid #4CAF50;
+  background-color: #bbdefb;
 }
 
 .calendar-day.other-month {
-  color: #ccc;
+  color: #b0bec5;
 }
 
 .event-dot {
   position: absolute;
-  bottom: 5px;
+  bottom: 4px;
   width: 6px;
   height: 6px;
   background-color: #4CAF50;
   border-radius: 50%;
+}
+
+/* Mobile optimizations */
+@media screen and (max-width: 768px) {
+  .calendar-grid {
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .weekday-header {
+    font-size: 0.7rem;
+    padding: 4px 0;
+  }
+
+  .calendar-day {
+    font-size: 0.8rem;
+  }
+
+  .event-dot {
+    width: 4px;
+    height: 4px;
+    bottom: 2px;
+  }
+
+  .countdown-grid {
+    padding: 8px;
+  }
+
+  .countdown-card {
+    min-width: 100px;
+    max-width: 130px;
+  }
+
+  .countdown-card .title {
+    font-size: 0.8em;
+  }
+
+  .countdown-card .subtitle {
+    font-size: 0.7em;
+  }
+
+  .countdown-card .has-text-grey {
+    font-size: 0.65em;
+  }
+
+  .days-remaining {
+    font-size: 0.9em;
+  }
+
+  .event-date {
+    font-size: 0.7em;
+  }
 }
