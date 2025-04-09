@@ -18,7 +18,7 @@
     <div class="office-card-container">
       <office-card name="Food" image="./assets/images/calendar.png" @click="navigateTo('food')"></office-card>
       <office-card name="Documents" image="./assets/images/documents.png" @click="navigateTo('todo')"></office-card>
-      <office-card name="Mail" image="./assets/images/mail.png" @click="navigateTo('mail')"></office-card>
+      <office-card name="Mail" image="./assets/images/mail.png" @click="navigateTo('compliment')"></office-card>
       <office-card name="Photos" image="./assets/images/photos.png" @click="navigateTo('photos')"></office-card>
     </div>
   </div>
@@ -44,11 +44,11 @@
         case 'todo':
           window.location.href = './todo.html';
           break;
-        case 'mail':
-          window.location.href = './mail.html';
+        case 'compliment':
+          window.location.href = './compliment.html';
           break;
-        case 'photos':
-          window.location.href = './photos.html';
+        case 'calendar':
+          window.location.href = './calendar.html';
           break;
         default:
           console.log('Unknown destination');
