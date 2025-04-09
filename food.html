@@ -1,15 +1,21 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Food</title>
+    <!-- Import Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="./assets/styles.css">
     <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
-    <meta charset="UTF-8">
 </head>
 
-<body>
-    <div id="app">
-        <h1>Food</h1>
+<body class="has-background-light">
+    <div id="app" class="container is-max-desktop px-4 py-4">
+        <div class="has-text-centered mb-4">
+            <h1 class="title is-2">Food</h1>
+        </div>
         <random-grid></random-grid>
     </div>
     <!-- Import App -->
@@ -21,7 +27,6 @@
     <script>
         const mountedApp = app.mount('#app')
     </script>
-
 </body>
 
 </html>
