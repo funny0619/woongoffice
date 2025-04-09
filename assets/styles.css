@@ -332,3 +332,155 @@ button:disabled {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+/* Calendar Styles */
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.countdown-grid {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.countdown-grid h2 {
+  color: #4CAF50;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.countdown-cards {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.countdown-card {
+  background: #FFF8F2;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  min-width: 150px;
+  max-width: 180px;
+}
+
+.countdown-card:hover {
+  transform: translateY(-3px);
+}
+
+.countdown-card h3 {
+  color: #333;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+.days-remaining {
+  font-size: 1.2em;
+  color: #4CAF50;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.event-date {
+  color: #666;
+  font-size: 0.8em;
+}
+
+.interactive-calendar {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-header h2 {
+  color: #4CAF50;
+  margin: 0;
+}
+
+.nav-button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #45a049;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.weekday-header {
+  text-align: center;
+  font-weight: bold;
+  color: #666;
+  padding: 10px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.calendar-day:hover {
+  background-color: #FFF8F2;
+}
+
+.calendar-day.today {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.calendar-day.selected {
+  background-color: #FFF8F2;
+  border: 2px solid #4CAF50;
+}
+
+.calendar-day.other-month {
+  color: #ccc;
+}
+
+.event-dot {
+  position: absolute;
+  bottom: 5px;
+  width: 6px;
+  height: 6px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+}
