@@ -8,19 +8,39 @@
   <link rel="stylesheet" href="./assets/styles.css" />
   <!-- Import Vue.js -->
   <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
 </head>
 
 <body>
   <div id="app">
-    <div class="header">
-      <h1>Woong Office</h1>
-    </div>
-    <div class="office-card-container">
-      <office-card name="Food" image="./assets/images/calendar.png" @click="navigateTo('food')"></office-card>
-      <office-card name="Documents" image="./assets/images/documents.png" @click="navigateTo('todo')"></office-card>
-      <office-card name="Mail" image="./assets/images/mail.png" @click="navigateTo('compliment')"></office-card>
-      <office-card name="Photos" image="./assets/images/photos.png" @click="navigateTo('calendar')"></office-card>
-    </div>
+    <section class="hero is-primary">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Woong Office</h1>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="columns is-multiline is-centered">
+          <div class="column is-3">
+            <office-card name="Food" image="./assets/images/calendar.png" @click="navigateTo('food')"></office-card>
+          </div>
+          <div class="column is-3">
+            <office-card name="Documents" image="./assets/images/documents.png"
+              @click="navigateTo('todo')"></office-card>
+          </div>
+          <div class="column is-3">
+            <office-card name="Mail" image="./assets/images/mail.png" @click="navigateTo('compliment')"></office-card>
+          </div>
+          <div class="column is-3">
+            <office-card name="Photos" image="./assets/images/photos.png" @click="navigateTo('calendar')"></office-card>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Import App -->
@@ -54,7 +74,6 @@
           console.log('Unknown destination');
       }
     };
-
   </script>
 </body>
 

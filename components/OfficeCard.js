@@ -12,9 +12,17 @@ app.component('office-card', {
     template:
         /* html */
         `
-        <div class="office-card">
-            <img :src="image" class="office-card-image" />
-            <h2 class="office-card-name">{{ name }}</h2>
+        <div class="card" style="cursor: pointer; height: 100%;">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                    <img :src="image" :alt="name" style="object-fit: cover;">
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="content has-text-centered">
+                    <h2 class="title is-4">{{ name }}</h2>
+                </div>
+            </div>
         </div>
         `
 })
