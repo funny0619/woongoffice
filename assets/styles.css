@@ -191,6 +191,9 @@ button:disabled {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  align-items: center;
+  min-width: 300px;
+  /* Ensure minimum width for the container */
 }
 
 .todo-input input {
@@ -199,6 +202,18 @@ button:disabled {
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 16px;
+  height: 40px;
+  min-width: 200px;
+  /* Ensure minimum width for the input */
+}
+
+.todo-input button {
+  height: 40px;
+  padding: 0 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background-color: #FBBF24;
+  /* Prevent button from shrinking */
 }
 
 .filter-buttons {
@@ -275,7 +290,7 @@ button:disabled {
   }
 
   .todo-input {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .filter-buttons {

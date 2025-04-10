@@ -19,13 +19,19 @@ const app = Vue.createApp({
     },
     computed: {
         filteredTasks() {
+            let tasks = this.tasks;
             switch (this.filter) {
                 case 'active':
-                    return this.tasks.filter(task => !task.completed);
+                    return tasks.filter(task => !task.completed);
                 case 'completed':
-                    return this.tasks.filter(task => task.completed);
+                    return tasks.filter(task => task.completed);
                 default:
-                    return this.tasks;
+                    // Sort tasks so that completed tasks appear at the end
+                    return [...tasks].sort((a, b) => {
+                        if (a.completed && !b.completed) return 1;
+                        if (!a.completed && b.completed) return -1;
+                        return 0;
+                    });
             }
         }
     },
