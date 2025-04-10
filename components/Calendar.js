@@ -23,7 +23,10 @@ app.component('calendar', {
             <div class="interactive-calendar">
                 <div class="calendar-header is-flex is-justify-content-space-between is-align-items-center mb-3">
                     <button @click="previousMonth" class="button is-small is-light">&lt;</button>
-                    <h2 class="title is-5">{{ currentMonthName }} {{ currentYear }}</h2>
+                    <div class="is-flex is-align-items-center gap-2">
+                        <h2 class="title is-6 mb-0 ml-0 mr-2">{{ currentMonthName }} {{ currentYear }}</h2>
+                        <button @click="jumpToToday" class="button is-small is-light">Today</button>
+                    </div>
                     <button @click="nextMonth" class="button is-small is-light">&gt;</button>
                 </div>
                 <div class="calendar-grid">
@@ -177,6 +180,11 @@ app.component('calendar', {
             const date = new Date(dateString);
             this.currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
             this.selectedDate = date;
+        },
+        jumpToToday() {
+            const today = new Date();
+            this.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            this.selectedDate = today;
         }
     }
 })
