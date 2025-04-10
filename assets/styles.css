@@ -3,6 +3,55 @@ html {
   background-color: #FFF8F2;
 }
 
+/* Navbar Styles */
+.navbar {
+  background-color: #c4a689 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.home-button {
+  position: fixed;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5C3A21;
+  font-weight: 500;
+}
+
+.title-item {
+  margin: 0 auto;
+  padding: 0;
+}
+
+.title-item .title {
+  margin: 0;
+  color: #5C3A21;
+}
+
+.navbar-item {
+  color: #5C3A21;
+  font-weight: 500;
+}
+
+.navbar-item:hover {
+  background-color: transparent !important;
+  color: #FBBF24;
+}
+
+/* Add padding to body to prevent navbar overlap */
+body {
+  padding-top: 3.25rem;
+}
+
 .header {
   background-color: #FFF8F2;
   padding: 20px;
