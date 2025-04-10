@@ -7,7 +7,7 @@ app.component('calendar', {
                 <h2 class="title is-5 has-text-centered mb-3">Upcoming Special Dates</h2>
                 <div class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
-                        <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                        <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
                             <div class="card-content p-2">
                                 <div class="is-flex is-justify-content-space-between is-align-items-center">
                                     <span class="title is-6 mb-0">{{ event.name }}</span>
@@ -172,6 +172,11 @@ app.component('calendar', {
                     date.getMonth() === eventDate.getMonth() &&
                     date.getFullYear() === eventDate.getFullYear();
             });
+        },
+        jumpToDate(dateString) {
+            const date = new Date(dateString);
+            this.currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            this.selectedDate = date;
         }
     }
 })
