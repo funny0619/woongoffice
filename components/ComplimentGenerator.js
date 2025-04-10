@@ -11,7 +11,7 @@ app.component('compliment-generator', {
                 />
             </div>
             <div class="speech-bubble" v-show="currentCompliment">
-                <p class="compliment-text">{{ currentCompliment }}</p>
+                <p class="compliment-text">{{ displayedText }}</p>
             </div>
         </div>
     `,
@@ -19,6 +19,7 @@ app.component('compliment-generator', {
         return {
             isTalking: false,
             currentCompliment: '',
+            displayedText: '',
             compliments: [
                 "You're doing an amazing job!",
                 "Your creativity is inspiring!",
@@ -33,7 +34,11 @@ app.component('compliment-generator', {
             ],
             idleBearImage: './assets/images/bear-idle.png',
             talkingBearImage: './assets/images/bear-talking.png',
-            timer: null
+            timer: null,
+            typingInterval: null,
+            animationInterval: null,
+            typingSpeed: 100, // milliseconds per word
+            animationSpeed: 150 // milliseconds per image switch
         }
     },
     methods: {
@@ -41,9 +46,46 @@ app.component('compliment-generator', {
             // Get a random compliment
             const randomIndex = Math.floor(Math.random() * this.compliments.length);
             this.currentCompliment = this.compliments[randomIndex];
+            this.displayedText = '';
 
-            // Set talking state
+            // Start typing effect
+            this.startTyping();
+        },
+        startTyping() {
+            // Clear any existing intervals
+            if (this.typingInterval) {
+                clearInterval(this.typingInterval);
+            }
+            if (this.animationInterval) {
+                clearInterval(this.animationInterval);
+            }
+
+            // Start talking animation
             this.isTalking = true;
+            this.animationInterval = setInterval(() => {
+                this.isTalking = !this.isTalking;
+            }, this.animationSpeed);
+
+            const words = this.currentCompliment.split(' ');
+            let currentIndex = 0;
+
+            this.typingInterval = setInterval(() => {
+                if (currentIndex < words.length) {
+                    this.displayedText += (currentIndex === 0 ? '' : ' ') + words[currentIndex];
+                    currentIndex++;
+                } else {
+                    // Ensure bear is in talking state before stopping
+                    this.isTalking = true;
+                    clearInterval(this.animationInterval);
+
+                    // Add a small delay before returning to idle
+                    setTimeout(() => {
+                        this.isTalking = false;
+                    }, 500);
+
+                    clearInterval(this.typingInterval);
+                }
+            }, this.typingSpeed);
         }
     },
     mounted() {
@@ -53,12 +95,18 @@ app.component('compliment-generator', {
         // Set up interval to generate new compliments
         this.timer = setInterval(() => {
             this.generateCompliment();
-        }, 5000);
+        }, 8000); // Increased interval to account for typing animation
     },
     beforeUnmount() {
-        // Clean up interval when component is destroyed
+        // Clean up intervals when component is destroyed
         if (this.timer) {
             clearInterval(this.timer);
+        }
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+        }
+        if (this.animationInterval) {
+            clearInterval(this.animationInterval);
         }
     }
 })
