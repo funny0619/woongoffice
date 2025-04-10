@@ -1,4 +1,5 @@
-body {
+body,
+html {
   background-color: #FFF8F2;
 }
 
@@ -78,8 +79,9 @@ body {
 }
 
 .grid-cell.highlighted {
-  background-color: #4CAF50;
-  color: white;
+  background-color: #fce303;
+  color: #FB7185;
+  font-weight: bold;
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -91,6 +93,9 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: clamp(12px, 2vw, 20px);
+  color: #5C3A21;
+
+  font-weight: bold;
   /* Responsive font size */
 }
 
@@ -100,8 +105,9 @@ body {
 
 button {
   padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
+  background-color: #FBBF24;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -109,19 +115,19 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #FBBF24;
 }
 
 .result {
   margin-top: 20px;
   font-size: 1.2em;
   font-weight: bold;
-  color: #4CAF50;
+  color: #d79c07;
   text-align: center;
 }
 
 button:disabled {
-  background-color: #cccccc;
+  background-color: #FBBF24;
   cursor: not-allowed;
 }
 
@@ -291,7 +297,7 @@ button:disabled {
 
 .compliment-text {
   font-size: 1.2em;
-  color: #4CAF50;
+  color: #F9A8D4;
   margin: 0;
   font-weight: 500;
   opacity: 1;

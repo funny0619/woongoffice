@@ -83,7 +83,7 @@ app.component('random-grid', {
         `
         <div class="random-grid-container">
             <button @click="startAnimation" :disabled="spinning">
-                {{ spinning ? 'Spinning...' : 'Select Random Food' }}
+                {{ spinning ? '뭐를 먹으깡~?' : '은댕이 음식 골르기!' }}
             </button>
 
             <div class="grid">
@@ -96,7 +96,7 @@ app.component('random-grid', {
             </div>
             
             <div v-if="currentSpinResult" class="result">
-                Selected: {{ currentSpinResult }}
+                헤헤헤 오늘은 {{ currentSpinResult }} 먹자!
             </div>
         </div>
     `
