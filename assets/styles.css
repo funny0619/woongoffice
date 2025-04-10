@@ -5,7 +5,7 @@ html {
 
 /* Navbar Styles */
 .navbar {
-  background-color: #c4a689 !important;
+  background-color: #c7b7a8 !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
 }
@@ -38,7 +38,7 @@ html {
 }
 
 .navbar-item {
-  color: #5C3A21;
+  color: #422b1a;
   font-weight: 500;
 }
 
@@ -185,6 +185,8 @@ button:disabled {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  margin-top: 5rem;
+  /* Increased margin to create more space below navbar */
 }
 
 .todo-input {
@@ -193,7 +195,6 @@ button:disabled {
   margin-bottom: 20px;
   align-items: center;
   min-width: 300px;
-  /* Ensure minimum width for the container */
 }
 
 .todo-input input {
@@ -234,8 +235,8 @@ button:disabled {
 }
 
 .filter-buttons button.active {
-  background-color: #4CAF50;
-  color: white;
+  background-color: #FBBF24;
+  color: rgb(0, 0, 0);
 }
 
 .todo-list {

@@ -4,7 +4,7 @@ app.component('calendar', {
         `
         <div class="calendar-container">
             <div class="countdown-grid mb-4">
-                <h2 class="title is-5 has-text-centered mb-3">기대되는 순간들</h2>
+                <h2 class="title is-5 has-text-centered mb-3">중요한 날들</h2>
                 <div class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
                         <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
