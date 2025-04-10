@@ -4,7 +4,7 @@ app.component('calendar', {
         `
         <div class="calendar-container">
             <div class="countdown-grid mb-4">
-                <h2 class="title is-5 has-text-centered mb-3">Upcoming Special Dates</h2>
+                <h2 class="title is-5 has-text-centered mb-3">기대되는 순간들</h2>
                 <div class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
                         <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
@@ -50,9 +50,10 @@ app.component('calendar', {
     data() {
         return {
             specialDates: [
-                { name: "Our 2nd Anniversary", date: "2025-10-26" },
-                { name: "Eunji's Birthday", date: "2025-12-15" },
-                { name: "Next Big Trip", date: "2026-03-01" }
+                { name: "Our 2nd Anniversary", date: "2025-04-13" },
+                { name: "Eunji's Birthday", date: "2025-09-21" },
+                { name: "Sunny's Birthday", date: "2025-06-19" },
+                { name: "World Ice Cream Day", date: "2025-07-21" },
             ],
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             currentDate: new Date(),
@@ -61,7 +62,7 @@ app.component('calendar', {
     },
     computed: {
         currentMonthName() {
-            return this.currentDate.toLocaleString('default', { month: 'long' });
+            return this.currentDate.toLocaleString('default', { month: 'short' });
         },
         currentYear() {
             return this.currentDate.getFullYear();

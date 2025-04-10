@@ -423,7 +423,7 @@ button:disabled {
 }
 
 .countdown-grid h2 {
-  color: #4CAF50;
+  color: #000000;
   margin-bottom: 12px;
   text-align: center;
   font-size: 1.1em;
@@ -473,12 +473,6 @@ button:disabled {
   text-overflow: ellipsis;
 }
 
-.days-remaining {
-  font-size: 1em;
-  color: #4CAF50;
-  font-weight: bold;
-  margin: 4px 0;
-}
 
 .event-date {
   color: #666;
@@ -504,12 +498,11 @@ button:disabled {
 }
 
 .calendar-header h2 {
-  color: #4CAF50;
+  color: #000000;
   margin: 0;
 }
 
 .nav-button {
-  background: #4CAF50;
   color: white;
   border: none;
   border-radius: 50%;
@@ -522,9 +515,6 @@ button:disabled {
   transition: background-color 0.3s ease;
 }
 
-.nav-button:hover {
-  background-color: #45a049;
-}
 
 .calendar-grid {
   display: grid;
