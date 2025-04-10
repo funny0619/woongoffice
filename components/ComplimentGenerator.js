@@ -32,8 +32,8 @@ app.component('compliment-generator', {
                 "You bring out the best in others!",
                 "You're making a real difference!"
             ],
-            idleBearImage: './assets/images/bear-idle.png',
-            talkingBearImage: './assets/images/bear-talking.png',
+            idleBearImage: './assets/images/bear-idle.jpg',
+            talkingBearImage: './assets/images/bear-talking.jpg',
             timer: null,
             typingInterval: null,
             animationInterval: null,
