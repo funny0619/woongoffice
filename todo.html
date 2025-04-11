@@ -10,19 +10,8 @@
 </head>
 
 <body>
-    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item home-button" href="./index.html">
-                <span class="icon">
-                    <img src="./assets/images/home.png" alt="Home">
-                </span>
-            </a>
-            <a class="navbar-item title-item" href="./index.html">
-                <h2 class="title is-5">으악 오늘 뭐할지 까먹지 말자!</h2>
-            </a>
-        </div>
-    </nav>
     <div id="app">
+        <nav-bar title="으악 오늘 뭐할지 까먹지 말자!"></nav-bar>
         <div class="todo-container">
             <div class="todo-input">
                 <input type="text" v-model="newTask" @keyup.enter="addTask" placeholder="Add a new task...">
@@ -49,6 +38,8 @@
 
     <!-- Import App -->
     <script src="./main.js"></script>
+    <!-- Import Components -->
+    <script src="./components/NavBar.js"></script>
     <!-- Mount App -->
     <script>
         const mountedApp = app.mount('#app')

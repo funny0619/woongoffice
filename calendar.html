@@ -12,28 +12,15 @@
 </head>
 
 <body>
-    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item home-button" href="./index.html">
-                <span class="icon">
-                    <img src="./assets/images/home.png" alt="Home">
-                </span>
-            </a>
-            <a class="navbar-item title-item" href="./index.html">
-                <h2 class="title is-5">두근 두근 기대되는 순간들!</h2>
-            </a>
-        </div>
-    </nav>
     <div id="app" class="container is-max-desktop px-4 py-4">
-        <!-- <div class="header">
-            <h1>Calendar</h1>
-        </div> -->
+        <nav-bar title="두근 두근 기대되는 순간들!"></nav-bar>
         <calendar></calendar>
     </div>
     <!-- Import App first -->
     <script src="./main.js"></script>
     <!-- Then import Components -->
     <script src="./components/Calendar.js"></script>
+    <script src="./components/NavBar.js"></script>
     <!-- Finally mount the app -->
     <script>
         const mountedApp = app.mount('#app')

@@ -12,24 +12,15 @@
 </head>
 
 <body>
-    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item home-button" href="./index.html">
-                <span class="icon">
-                    <img src="./assets/images/home.png" alt="Home">
-                </span>
-            </a>
-            <a class="navbar-item title-item" href="./index.html">
-                <h2 class="title is-5">은댕이 자존심 지키미!</h2>
-            </a>
-        </div>
-    </nav>
+
     <div id="app" class="container is-max-desktop px-4 py-4">
+        <nav-bar title="은댕이 자존심 지키미!"></nav-bar>
         <compliment-generator></compliment-generator>
     </div>
     <!-- Import App first -->
     <script src="./main.js"></script>
     <!-- Then import Components -->
+    <script src="./components/NavBar.js"></script>
     <script src="./components/ComplimentGenerator.js"></script>
     <!-- Finally mount the app -->
     <script>
