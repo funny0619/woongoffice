@@ -19,6 +19,7 @@ app.component('compliment-generator', {
         return {
             isTalking: false,
             currentCompliment: '',
+            previousCompliment: '',
             displayedText: '',
             compliments: [
                 "은댕앙!💖 아가는 모든지 할 수 있어! 😄",
@@ -41,8 +42,13 @@ app.component('compliment-generator', {
     },
     methods: {
         generateCompliment() {
-            // Get a random compliment
-            const randomIndex = Math.floor(Math.random() * this.compliments.length);
+            // Get a random compliment that's different from the previous one
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * this.compliments.length);
+            } while (this.compliments[randomIndex] === this.previousCompliment);
+
+            this.previousCompliment = this.currentCompliment; // Store current as previous
             this.currentCompliment = this.compliments[randomIndex];
             this.displayedText = '';
 

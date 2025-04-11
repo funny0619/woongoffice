@@ -343,7 +343,7 @@ button:disabled {
   max-width: 400px;
   margin: 0 auto;
   position: relative;
-  min-height: 300px;
+  min-height: 350px;
 }
 
 .bear-container {
@@ -352,7 +352,7 @@ button:disabled {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 100px;
+  margin-top: 150px;
 }
 
 .bear-image {
@@ -370,15 +370,16 @@ button:disabled {
   position: absolute;
   background: white;
   border-radius: 20px;
-  padding: 15px 25px;
+  padding: 10px 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-width: 250px;
+  width: 250px;
   text-align: center;
-  top: 20px;
+  top: 100px;
   left: 50%;
   transform: translateX(-50%);
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
+  z-index: 2;
 }
 
 .speech-bubble:before {
@@ -395,12 +396,14 @@ button:disabled {
 }
 
 .compliment-text {
-  font-size: 1.2em;
+  font-size: 1em;
   color: #F9A8D4;
   margin: 0;
   font-weight: 500;
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
+  word-wrap: break-word;
+  line-height: 1.4;
 }
 
 @keyframes fadeIn {
@@ -600,9 +603,9 @@ button:disabled {
 .event-dot {
   position: absolute;
   bottom: 4px;
-  width: 6px;
-  height: 6px;
-  background-color: #4CAF50;
+  width: 12px;
+  height: 12px;
+  background-color: #fc4f05;
   border-radius: 50%;
 }
 

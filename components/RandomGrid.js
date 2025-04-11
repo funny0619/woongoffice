@@ -4,7 +4,7 @@ app.component('random-grid', {
             currentSpinResult: null,
             spinning: false,
             currentIndex: -1,
-            allFoods: ['피자', '파스타', '순두부', '양꼬치', '백반', '장어', '커피', '두부조림', '아이스크림', '빵'],
+            allFoods: ['순두두', '참치 마요요', '메추리알', '고구마', '닭가슴 살', '베트남 국수', '떡볶이', '만두 국', '냉면', '부대찌개', '돈가스', '계란찜', '고기'],
             selectedFoods: [],
             highlightedIndex: -1,
             animationSteps: 0,
