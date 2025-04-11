@@ -27,10 +27,8 @@ app.component('random-grid', {
         startAnimation() {
             if (this.spinning) return;
 
-            // First select random foods if not already selected
-            if (this.selectedFoods.length === 0) {
-                this.selectRandomFoods();
-            }
+            // Always select new random foods when button is clicked
+            this.selectRandomFoods();
 
             this.spinning = true;
             this.currentIndex = -1;
