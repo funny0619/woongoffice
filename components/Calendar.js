@@ -49,56 +49,43 @@ app.component('calendar', {
     `,
     data() {
         const now = new Date();
+        const year = now.getFullYear();
+
         return {
             currentDate: now,
-            year: now.getFullYear(),
+            selectedDate: null,
+            weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             lunarCalendar: new KoreanLunarCalendar(),
             specialDates: [
-                { name: "Our 2nd Anniversary", date: now.getFullYear() + "-04-13" },
-                { name: "Eunji's Birthday", date: now.getFullYear() + "-09-21" },
-                { name: "Sunny's Birthday", date: now.getFullYear() + "-06-19" },
-                { name: "World Ice Cream Day", date: now.getFullYear() + "-07-21" },
-                { name: "Susan's Birthday", date: now.getFullYear() + "-07-26" },
-                { name: "Danna's Birthday", date: now.getFullYear() + "-12-07" },
-                { name: "희주 누나 생일일", date: now.getFullYear() + "-11-30" },
-            ],
-            weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-            selectedDate: null
+                { name: "Our 2nd Anniversary", date: `${year}-04-13` },
+                { name: "Eunji's Birthday", date: `${year}-09-21` },
+                { name: "Sunny's Birthday", date: `${year}-06-19` },
+                { name: "World Ice Cream Day", date: `${year}-07-21` },
+                { name: "Susan's Birthday", date: `${year}-07-26` },
+                { name: "Danna's Birthday", date: `${year}-12-07` },
+                { name: "희주 누나 생일일", date: `${year}-11-30` },
+                { name: "은댕이 어머님 생신", lunar: { year, month: 3, day: 4 } },
+                { name: "은댕이 아버님 생신", lunar: { year, month: 3, day: 16 } }
+            ]
         }
     },
     computed: {
         processedSpecialDates() {
+            return this.specialDates.map(event => ({
+                name: event.name,
+                date: event.lunar ? this.getLunarDate(event.lunar) : event.date
+            }));
+        },
+        sortedSpecialDates() {
             const now = new Date();
-            const lunarDates = [
-                {
-                    name: "은댕이 어머님 생신",
-                    lunarYear: now.getFullYear(),
-                    lunarMonth: 3,
-                    lunarDay: 4
-                },
-                {
-                    name: "은댕이 아버님 생신",
-                    lunarYear: now.getFullYear(),
-                    lunarMonth: 3,
-                    lunarDay: 16
-                }
-            ];
-
-            const solarDates = lunarDates.map(date => {
-                this.lunarCalendar.setLunarDate(
-                    date.lunarYear,
-                    date.lunarMonth,
-                    date.lunarDay,
-                    false
-                );
-                const solar = this.lunarCalendar.getSolarCalendar();
-                return {
-                    name: date.name,
-                    date: `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`
-                };
-            });
-
-            return [...this.specialDates, ...solarDates];
+            return this.processedSpecialDates
+                .map(event => ({
+                    ...event,
+                    daysRemaining: Math.ceil((new Date(event.date) - now) / (1000 * 60 * 60 * 24))
+                }))
+                .filter(event => event.daysRemaining > 0)
+                .sort((a, b) => a.daysRemaining - b.daysRemaining)
+                .slice(0, 3);
         },
         currentMonthName() {
             return this.currentDate.toLocaleString('default', { month: 'short' });
@@ -106,45 +93,23 @@ app.component('calendar', {
         currentYear() {
             return this.currentDate.getFullYear();
         },
-        sortedSpecialDates() {
-            return this.processedSpecialDates
-                .map(event => ({
-                    ...event,
-                    daysRemaining: this.calculateDaysRemaining(event.date)
-                }))
-                .filter(event => event.daysRemaining > 0)
-                .sort((a, b) => a.daysRemaining - b.daysRemaining)
-                .slice(0, 3);
-        },
         calendarDays() {
             const year = this.currentDate.getFullYear();
             const month = this.currentDate.getMonth();
-
-            // Get first day of the month
-            const firstDay = new Date(year, month, 1);
-            const startingDay = firstDay.getDay();
-
-            // Get last day of the month
-            const lastDay = new Date(year, month + 1, 0);
-            const totalDays = lastDay.getDate();
-
-            // Get days from previous month
-            const prevMonth = new Date(year, month, 0);
-            const prevMonthDays = prevMonth.getDate();
-
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const prevMonthLastDate = new Date(year, month, 0).getDate();
             const days = [];
 
-            // Add days from previous month
-            for (let i = startingDay - 1; i >= 0; i--) {
+            for (let i = firstDay - 1; i >= 0; i--) {
                 days.push({
-                    day: prevMonthDays - i,
-                    date: new Date(year, month - 1, prevMonthDays - i),
+                    day: prevMonthLastDate - i,
+                    date: new Date(year, month - 1, prevMonthLastDate - i),
                     isCurrentMonth: false
                 });
             }
 
-            // Add days from current month
-            for (let i = 1; i <= totalDays; i++) {
+            for (let i = 1; i <= lastDate; i++) {
                 days.push({
                     day: i,
                     date: new Date(year, month, i),
@@ -152,8 +117,7 @@ app.component('calendar', {
                 });
             }
 
-            // Add days from next month
-            const remainingDays = 42 - days.length; // 6 rows * 7 days
+            const remainingDays = 42 - days.length;
             for (let i = 1; i <= remainingDays; i++) {
                 days.push({
                     day: i,
@@ -166,33 +130,23 @@ app.component('calendar', {
         }
     },
     methods: {
-        calculateDaysRemaining(eventDate) {
-            const today = new Date();
-            const event = new Date(eventDate);
-            const diffTime = event - today;
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        getLunarDate({ year, month, day }) {
+            this.lunarCalendar.setLunarDate(year, month, day, false);
+            const solar = this.lunarCalendar.getSolarCalendar();
+            return `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`;
         },
         formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
+            return new Date(dateString).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
         },
         previousMonth() {
-            this.currentDate = new Date(
-                this.currentDate.getFullYear(),
-                this.currentDate.getMonth() - 1,
-                1
-            );
+            this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
         },
         nextMonth() {
-            this.currentDate = new Date(
-                this.currentDate.getFullYear(),
-                this.currentDate.getMonth() + 1,
-                1
-            );
+            this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
         },
         isToday(date) {
             const today = new Date();
@@ -201,8 +155,8 @@ app.component('calendar', {
                 date.getFullYear() === today.getFullYear();
         },
         isSelected(date) {
-            if (!this.selectedDate) return false;
-            return date.getDate() === this.selectedDate.getDate() &&
+            return this.selectedDate &&
+                date.getDate() === this.selectedDate.getDate() &&
                 date.getMonth() === this.selectedDate.getMonth() &&
                 date.getFullYear() === this.selectedDate.getFullYear();
         },
