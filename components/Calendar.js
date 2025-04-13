@@ -11,7 +11,7 @@ app.component('calendar', {
                             <div class="card-content p-2">
                                 <div class="is-flex is-justify-content-space-between is-align-items-center">
                                     <span class="title is-6 mb-0">{{ event.name }}</span>
-                                    <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }} days</span>
+                                    <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }}</span>
                                 </div>
                                 <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
                             </div>
@@ -43,7 +43,9 @@ app.component('calendar', {
                         {{ day.day }}
                         <div v-if="hasEvent(day.date)" class="event-dot"></div>
                         <div v-if="isSelected(day.date) && hasEvent(day.date)" class="tooltip">
-                            {{ getEventName(day.date) }}
+                            <div v-for="(eventName, index) in getEventName(day.date)" :key="index" class="tooltip-item">
+                                {{ eventName }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -96,8 +98,16 @@ app.component('calendar', {
                     ...event,
                     daysRemaining: Math.ceil((new Date(event.date) - now) / (1000 * 60 * 60 * 24))
                 }))
-                .filter(event => event.daysRemaining > 0)
-                .sort((a, b) => a.daysRemaining - b.daysRemaining)
+                .filter(event => event.daysRemaining >= 0)
+                .map(event => ({
+                    ...event,
+                    daysRemaining: event.daysRemaining === 0 ? 'Today' : `${event.daysRemaining} days`
+                }))
+                .sort((a, b) => {
+                    if (a.daysRemaining === 'Today') return -1;
+                    if (b.daysRemaining === 'Today') return 1;
+                    return parseInt(a.daysRemaining) - parseInt(b.daysRemaining);
+                })
                 .slice(0, 3);
         },
         currentMonthName() {
@@ -177,12 +187,19 @@ app.component('calendar', {
             this.selectedDate = date;
         },
         hasEvent(date) {
-            return this.processedSpecialDates.some(event => {
+            return this.getEventsForDate(date).length > 0;
+        },
+        getEventsForDate(date) {
+            return this.processedSpecialDates.filter(event => {
                 const eventDate = new Date(event.date);
                 return date.getDate() === eventDate.getDate() &&
                     date.getMonth() === eventDate.getMonth() &&
                     date.getFullYear() === eventDate.getFullYear();
             });
+        },
+        getEventName(date) {
+            const events = this.getEventsForDate(date);
+            return events.map(event => event.name);
         },
         jumpToDate(dateString) {
             const date = new Date(dateString);
@@ -193,15 +210,6 @@ app.component('calendar', {
             const today = new Date();
             this.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
             this.selectedDate = today;
-        },
-        getEventName(date) {
-            const event = this.processedSpecialDates.find(event => {
-                const eventDate = new Date(event.date);
-                return date.getDate() === eventDate.getDate() &&
-                    date.getMonth() === eventDate.getMonth() &&
-                    date.getFullYear() === eventDate.getFullYear();
-            });
-            return event ? event.name : '';
         },
         getOrdinalSuffix(number) {
             const suffixes = ['th', 'st', 'nd', 'rd'];
