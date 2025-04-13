@@ -57,7 +57,7 @@ app.component('calendar', {
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             lunarCalendar: new KoreanLunarCalendar(),
             specialDates: [
-                { name: "Our 2nd Anniversary", month: 4, day: 13 },
+                { name: "Our Anniversary", month: 4, day: 13, isAnniversary: true },
                 { name: "Eunji's Birthday", month: 9, day: 21 },
                 { name: "Sunny's Birthday", month: 6, day: 19 },
                 { name: "World Ice Cream Day", month: 7, day: 21 },
@@ -72,12 +72,22 @@ app.component('calendar', {
     computed: {
         processedSpecialDates() {
             const year = this.currentDate.getFullYear();
-            return this.specialDates.map(event => ({
-                name: event.name,
-                date: event.lunar ?
-                    this.getLunarDate({ year, ...event.lunar }) :
-                    `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
-            }));
+            return this.specialDates.map(event => {
+                if (event.isAnniversary) {
+                    const anniversaryYear = 2024; // The year of the first anniversary
+                    const anniversaryNumber = year - anniversaryYear + 1;
+                    return {
+                        name: `Our ${anniversaryNumber}${this.getOrdinalSuffix(anniversaryNumber)} Anniversary`,
+                        date: `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
+                    };
+                }
+                return {
+                    name: event.name,
+                    date: event.lunar ?
+                        this.getLunarDate({ year, ...event.lunar }) :
+                        `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
+                };
+            });
         },
         sortedSpecialDates() {
             const now = new Date();
@@ -192,6 +202,11 @@ app.component('calendar', {
                     date.getFullYear() === eventDate.getFullYear();
             });
             return event ? event.name : '';
+        },
+        getOrdinalSuffix(number) {
+            const suffixes = ['th', 'st', 'nd', 'rd'];
+            const v = number % 100;
+            return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
         }
     }
 })

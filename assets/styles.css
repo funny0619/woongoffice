@@ -589,7 +589,7 @@ button:disabled {
 
 .calendar-day.today {
   background-color: #e3f2fd;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .calendar-day.selected {
@@ -666,8 +666,8 @@ button:disabled {
   top: -35px;
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
-  color: white;
+  background: #f6fa7e;
+  color: rgb(0, 0, 0);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 13px;
@@ -686,5 +686,5 @@ button:disabled {
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 6px solid #333;
+  border-top: 6px solid #f6fa7e;
 }
