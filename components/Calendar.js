@@ -48,32 +48,32 @@ app.component('calendar', {
         </div>
     `,
     data() {
-        const now = new Date();
-        const year = now.getFullYear();
-
         return {
-            currentDate: now,
+            currentDate: new Date(),
             selectedDate: null,
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             lunarCalendar: new KoreanLunarCalendar(),
             specialDates: [
-                { name: "Our 2nd Anniversary", date: `${year}-04-13` },
-                { name: "Eunji's Birthday", date: `${year}-09-21` },
-                { name: "Sunny's Birthday", date: `${year}-06-19` },
-                { name: "World Ice Cream Day", date: `${year}-07-21` },
-                { name: "Susan's Birthday", date: `${year}-07-26` },
-                { name: "Danna's Birthday", date: `${year}-12-07` },
-                { name: "희주 누나 생일일", date: `${year}-11-30` },
-                { name: "은댕이 어머님 생신", lunar: { year, month: 3, day: 4 } },
-                { name: "은댕이 아버님 생신", lunar: { year, month: 3, day: 16 } }
+                { name: "Our 2nd Anniversary", month: 4, day: 13 },
+                { name: "Eunji's Birthday", month: 9, day: 21 },
+                { name: "Sunny's Birthday", month: 6, day: 19 },
+                { name: "World Ice Cream Day", month: 7, day: 21 },
+                { name: "Susan's Birthday", month: 7, day: 26 },
+                { name: "Danna's Birthday", month: 12, day: 7 },
+                { name: "희주 누나 생일일", month: 11, day: 30 },
+                { name: "은댕이 어머님 생신", lunar: { month: 3, day: 4 } },
+                { name: "은댕이 아버님 생신", lunar: { month: 3, day: 16 } }
             ]
         }
     },
     computed: {
         processedSpecialDates() {
+            const year = this.currentDate.getFullYear();
             return this.specialDates.map(event => ({
                 name: event.name,
-                date: event.lunar ? this.getLunarDate(event.lunar) : event.date
+                date: event.lunar ?
+                    this.getLunarDate({ year, ...event.lunar }) :
+                    `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
             }));
         },
         sortedSpecialDates() {
