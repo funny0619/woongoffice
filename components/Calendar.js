@@ -42,6 +42,9 @@ app.component('calendar', {
                     >
                         {{ day.day }}
                         <div v-if="hasEvent(day.date)" class="event-dot"></div>
+                        <div v-if="isSelected(day.date) && hasEvent(day.date)" class="tooltip">
+                            {{ getEventName(day.date) }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,6 +183,15 @@ app.component('calendar', {
             const today = new Date();
             this.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
             this.selectedDate = today;
+        },
+        getEventName(date) {
+            const event = this.processedSpecialDates.find(event => {
+                const eventDate = new Date(event.date);
+                return date.getDate() === eventDate.getDate() &&
+                    date.getMonth() === eventDate.getMonth() &&
+                    date.getFullYear() === eventDate.getFullYear();
+            });
+            return event ? event.name : '';
         }
     }
 })
