@@ -1,3 +1,6 @@
+// Global variable to store tasks
+let globalTasks = [];
+
 async function completeTask(task) {
     task.completed = !task.completed;
     // post request to update the task using the id and the completed value
@@ -12,6 +15,12 @@ async function completeTask(task) {
                 completed: task.completed
             })
         });
+
+        // Update the task in the global array
+        const taskIndex = globalTasks.findIndex(t => t.id === task.id);
+        if (taskIndex !== -1) {
+            globalTasks[taskIndex].completed = task.completed;
+        }
     } catch (error) {
         console.error('Error updating task:', error);
     }
@@ -50,6 +59,9 @@ async function deleteTask(taskId) {
         taskElement.remove();
     }
 
+    // Remove from global tasks array
+    globalTasks = globalTasks.filter(task => task.id !== taskId);
+
     // Send delete request to the backend
     try {
         fetch('http://localhost:8000/api/deleteTask/', {
@@ -67,35 +79,40 @@ async function deleteTask(taskId) {
     // No need to refresh the list since we've already removed the task
 }
 
-// Function to list all tasks
-async function listTasks() {
-    try {
-        const response = await fetch('http://localhost:8000/api/listTasks/');
-        var tasks = await response.json();
-        const todoList = document.getElementsByClassName('todo-list')[0]; // get the ul tag
-        todoList.innerHTML = '';
-
-        const filterButton = document.getElementsByClassName('active')[0];
-        if (filterButton.id === 'allButton') {
-            tasks = tasks['tasks'];
-        } else if (filterButton.id === 'activeButton') {
-            tasks = tasks['tasks'].filter(task => !task.completed);
-        } else if (filterButton.id === 'completedButton') {
-            tasks = tasks['tasks'].filter(task => task.completed);
+// Function to list all tasks - only fetches from API when needed
+async function listTasks(forceRefresh = false) {
+    // Only fetch tasks from API if global tasks is empty or force refresh is true
+    if (globalTasks.length === 0 || forceRefresh) {
+        try {
+            const response = await fetch('http://localhost:8000/api/listTasks/');
+            const data = await response.json();
+            globalTasks = data['tasks'];
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+            return;
         }
-
-        // Sort tasks so completed tasks appear at the end
-        const sortedTasks = tasks.sort((a, b) => {
-            if (a.completed && !b.completed) return 1;
-            if (!a.completed && b.completed) return -1;
-            return 0;
-        });
-
-        displayTasks(sortedTasks, todoList);
-
-    } catch (error) {
-        console.error('Error fetching tasks:', error);
     }
+
+    const todoList = document.getElementsByClassName('todo-list')[0]; // get the ul tag
+    todoList.innerHTML = '';
+
+    let filteredTasks = [...globalTasks]; // Create a copy of the global tasks
+
+    const filterButton = document.getElementsByClassName('active')[0];
+    if (filterButton.id === 'activeButton') {
+        filteredTasks = filteredTasks.filter(task => !task.completed);
+    } else if (filterButton.id === 'completedButton') {
+        filteredTasks = filteredTasks.filter(task => task.completed);
+    }
+
+    // Sort tasks so completed tasks appear at the end
+    const sortedTasks = filteredTasks.sort((a, b) => {
+        if (a.completed && !b.completed) return 1;
+        if (!a.completed && b.completed) return -1;
+        return 0;
+    });
+
+    displayTasks(sortedTasks, todoList);
 }
 
 function displayTasks(sortedTasks, todoList) {
@@ -150,8 +167,8 @@ function setActiveButton(button) {
 document.addEventListener('DOMContentLoaded', () => {
     const addTaskButton = document.getElementById('addTaskButton');
 
-    // console.log('DOMContentLoaded');
-    listTasks();
+    // Initial load of tasks from the API
+    listTasks(true);
 
     // Add task button event listener
     if (addTaskButton) {
@@ -165,22 +182,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (document.getElementById('taskInput').value.trim() === '') {
                     return;
                 }
+
+                // Create the new task object
+                const newTask = {
+                    id: guid(),
+                    description: document.getElementById('taskInput').value,
+                    completed: false
+                };
+
                 // Send a POST request to the API endpoint with the task description
                 const response = await fetch('http://localhost:8000/api/createTask/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    // Get the value of the input field when the button is clicked
-                    // and send it in the request body
-                    body: JSON.stringify({ id: guid(), description: document.getElementById('taskInput').value, completed: false })
+                    body: JSON.stringify(newTask)
                 });
 
                 const data = await response.json();
                 console.log('Data parsed:', data); // Debug log
 
-                // After creating a task, refresh the task list
-                await listTasks();
+                // Add the new task to global tasks array
+                globalTasks.push(newTask);
+
+                // Refresh the task list with the updated global tasks
+                listTasks(false);
+
                 // clear the input field
                 document.getElementById('taskInput').value = '';
             } catch (error) {
@@ -198,16 +225,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     allButton.addEventListener('click', () => {
         setActiveButton(allButton);
-        listTasks();
+        // No need for API call, just filter the existing tasks
+        listTasks(false);
     });
 
     activeButton.addEventListener('click', () => {
         setActiveButton(activeButton);
-        listTasks();
+        // No need for API call, just filter the existing tasks
+        listTasks(false);
     });
 
     completedButton.addEventListener('click', () => {
         setActiveButton(completedButton);
-        listTasks();
+        // No need for API call, just filter the existing tasks
+        listTasks(false);
     });
 });
