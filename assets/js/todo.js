@@ -1,20 +1,18 @@
 // Global variable to store tasks
 let globalTasks = [];
-let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/api/';
+let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/';
 async function completeTask(task) {
     task.completed = !task.completed;
     // post request to update the task using the id and the completed value
     try {
-        fetch(url + 'updateTask/', {
+        fetch(url + 'updateTask', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify({
-                id: task.id,
-                completed: task.completed
-            })
+            body: `id=${encodeURIComponent(task.id)}`
         });
+
 
         // Update the task in the global array
         const taskIndex = globalTasks.findIndex(t => t.id === task.id);
@@ -76,14 +74,12 @@ async function deleteTask(taskId) {
 
     // Send delete request to the backend
     try {
-        fetch(url + 'deleteTask/', {
-            method: 'DELETE',
+        fetch(url + 'deleteTask', {
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify({
-                id: taskId
-            })
+            body: `id=${encodeURIComponent(taskId)}`
         });
     } catch (error) {
         console.error('Error deleting task:', error);
@@ -96,7 +92,7 @@ async function listTasks(forceRefresh = false) {
     // Only fetch tasks from API if global tasks is empty or force refresh is true
     if (globalTasks.length === 0 || forceRefresh) {
         try {
-            const response = await fetch(url + 'listTasks/');
+            const response = await fetch(url + 'listTasks');
             const data = await response.json();
             globalTasks = data['tasks'];
         } catch (error) {
@@ -202,17 +198,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     completed: false
                 };
 
+                const formBody = `id=${encodeURIComponent(newTask.id)}&description=${encodeURIComponent(newTask.description)}&completed=${newTask.completed}`;
                 // Send a POST request to the API endpoint with the task description
-                const response = await fetch(url + 'createTask/', {
+                const response = await fetch(url + 'createTask', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify(newTask)
+                    body: formBody
                 });
 
                 const data = await response.json();
-                console.log('Data parsed:', data); // Debug log
 
                 // Add the new task to global tasks array
                 globalTasks.push(newTask);
