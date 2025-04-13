@@ -25,6 +25,18 @@ async function completeTask(task) {
         console.error('Error updating task:', error);
     }
 
+    // Check which filter is currently active
+    const activeFilter = document.getElementsByClassName('active')[0].id;
+
+    // If we're on a filtered view and the task now doesn't match the filter, reapply filter
+    if ((activeFilter === 'activeButton' && task.completed) ||
+        (activeFilter === 'completedButton' && !task.completed)) {
+        // Reapply the current filter immediately
+        listTasks(false);
+        return; // Exit early since we're refreshing the whole list
+    }
+
+    // If we're showing all tasks or the task still matches the filter, just update the UI
     // Find the task element in the DOM and update its class immediately
     const taskElement = document.querySelector(`li[data-task-id="${task.id}"]`);
     if (taskElement) {
