@@ -1,16 +1,20 @@
 async function completeTask(task) {
     task.completed = !task.completed;
     // post request to update the task using the id and the completed value
-    fetch('http://localhost:8000/api/updateTask/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id: task.id,
-            completed: task.completed
-        })
-    });
+    try {
+        fetch('http://localhost:8000/api/updateTask/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: task.id,
+                completed: task.completed
+            })
+        });
+    } catch (error) {
+        console.error('Error updating task:', error);
+    }
 
     // Find the task element in the DOM and update its class immediately
     const taskElement = document.querySelector(`li[data-task-id="${task.id}"]`);
@@ -47,15 +51,19 @@ async function deleteTask(taskId) {
     }
 
     // Send delete request to the backend
-    fetch('http://localhost:8000/api/deleteTask/', {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id: taskId
-        })
-    });
+    try {
+        fetch('http://localhost:8000/api/deleteTask/', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: taskId
+            })
+        });
+    } catch (error) {
+        console.error('Error deleting task:', error);
+    }
     // No need to refresh the list since we've already removed the task
 }
 
