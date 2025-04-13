@@ -11,8 +11,32 @@ async function completeTask(task) {
             completed: task.completed
         })
     });
-    // refresh the task list
-    await listAllTasks();
+
+    // Find the task element in the DOM and update its class immediately
+    const taskElement = document.querySelector(`li[data-task-id="${task.id}"]`);
+    if (taskElement) {
+        if (task.completed) {
+            taskElement.classList.add('completed');
+        } else {
+            taskElement.classList.remove('completed');
+        }
+    }
+
+    // Re-sort the list
+    const todoList = document.getElementsByClassName('todo-list')[0];
+    const tasks = Array.from(todoList.children);
+
+    // Sort the tasks based on completion status
+    tasks.sort((a, b) => {
+        const aCompleted = a.classList.contains('completed');
+        const bCompleted = b.classList.contains('completed');
+        if (aCompleted && !bCompleted) return 1;
+        if (!aCompleted && bCompleted) return -1;
+        return 0;
+    });
+
+    // Re-append the sorted tasks
+    tasks.forEach(task => todoList.appendChild(task));
 }
 
 async function deleteTask(taskId) {
@@ -30,11 +54,18 @@ async function listAllTasks() {
         const tasks = await response.json();
         const todoList = document.getElementsByClassName('todo-list')[0]; // get the ul tag
         todoList.innerHTML = '';
-        tasks['tasks'].forEach(task => {
-            console.log(task);
+
+        // Sort tasks so completed tasks appear at the end
+        const sortedTasks = tasks['tasks'].sort((a, b) => {
+            if (a.completed && !b.completed) return 1;
+            if (!a.completed && b.completed) return -1;
+            return 0;
+        });
+
+        sortedTasks.forEach(task => {
             // create a li tag
             const li = document.createElement('li');
-            li.key = task.id;
+            li.setAttribute('data-task-id', task.id); // Use data-task-id instead of key
             if (task.completed) {
                 li.className = 'completed';
             }
@@ -77,7 +108,7 @@ async function listAllTasks() {
 document.addEventListener('DOMContentLoaded', () => {
     const addTaskButton = document.getElementById('addTaskButton');
 
-    console.log('DOMContentLoaded');
+    // console.log('DOMContentLoaded');
     // Call listAllTasks when the page loads
     listAllTasks();
 
@@ -89,14 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     var w = () => { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); }
                     return `${w()}${w()}-${w()}-${w()}-${w()}-${w()}${w()}${w()}`;
                 }
-                // if the input field isnot  empty send the request
-                // even if its just whitespace
-                console.log(document.getElementById('taskInput'))
-                console.log('Input field value:', document.getElementById('taskInput').value); // Debug log
                 // Check if the input field is empty or contains only whitespace
                 if (document.getElementById('taskInput').value.trim() === '') {
-                    console.log('Input field is empty!');
-                    console.log('Input field value:', document.getElementById('taskInput').value); // Debug log
                     return;
                 }
                 // Send a POST request to the API endpoint with the task description
