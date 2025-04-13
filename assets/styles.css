@@ -189,12 +189,16 @@ body {
 button {
   padding: 10px 20px;
   background-color: #FBBF24;
-  color: rgb(0, 0, 0);
+  color: #000000;
   font-weight: bold;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+}
+
+#addTaskButton {
+  color: #000000 !important;
 }
 
 button:hover {
