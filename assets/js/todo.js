@@ -40,11 +40,23 @@ async function completeTask(task) {
 }
 
 async function deleteTask(taskId) {
-    fetch('http://localhost:8000/api/deleteTask/' + taskId + '/', {
-        method: 'DELETE'
+    // Remove the task from the DOM immediately
+    const taskElement = document.querySelector(`li[data-task-id="${taskId}"]`);
+    if (taskElement) {
+        taskElement.remove();
+    }
+
+    // Send delete request to the backend
+    fetch('http://localhost:8000/api/deleteTask/', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: taskId
+        })
     });
-    // refresh the task list
-    await listAllTasks();
+    // No need to refresh the list since we've already removed the task
 }
 
 // Function to list all tasks
@@ -140,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // After creating a task, refresh the task list
                 await listAllTasks();
+                // clear the input field
+                document.getElementById('taskInput').value = '';
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
