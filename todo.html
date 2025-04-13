@@ -16,30 +16,30 @@
         <nav-bar title="으악 오늘 뭐할지 까먹지 말자!"></nav-bar>
         <div class="todo-container">
             <div class="todo-input">
-                <input type="text" v-model="newTask" @keyup.enter="addTask" placeholder="Add a new task...">
-                <button @click="addTask">Add Task</button>
+                <input type="text" placeholder="Add a new task..." id="taskInput">
+                <button @click="addTask" id="addTaskButton">Add Task</button>
             </div>
 
             <div class="filter-buttons">
-                <button :class="{ active: filter === 'all' }" @click="setFilter('all')">All</button>
-                <button :class="{ active: filter === 'active' }" @click="setFilter('active')">Active</button>
-                <button :class="{ active: filter === 'completed' }" @click="setFilter('completed')">Completed</button>
+                <button>All</button>
+                <button>Active</button>
+                <button>Completed</button>
             </div>
-
             <ul class="todo-list">
-                <li v-for="task in filteredTasks" :key="task.id" :class="{ completed: task.completed }">
+                <!-- <li v-for="task in filteredTasks" :key="task.id" :class="{ completed: task.completed }">
                     <div class="task-content">
                         <input type="checkbox" :checked="task.completed" @change="toggleTask(task)">
                         <span>{{ task.text }}</span>
                     </div>
                     <button class="delete-btn" @click="deleteTask(task.id)">×</button>
-                </li>
+                </li> -->
             </ul>
         </div>
     </div>
 
     <!-- Import App -->
     <script src="./main.js"></script>
+    <script src="./assets/js/todo.js"></script>
     <!-- Import Components -->
     <script src="./components/NavBar.js"></script>
     <!-- Mount App -->
