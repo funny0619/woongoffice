@@ -68,60 +68,82 @@ async function deleteTask(taskId) {
 }
 
 // Function to list all tasks
-async function listAllTasks() {
+async function listTasks() {
     try {
         const response = await fetch('http://localhost:8000/api/listTasks/');
-        const tasks = await response.json();
+        var tasks = await response.json();
         const todoList = document.getElementsByClassName('todo-list')[0]; // get the ul tag
         todoList.innerHTML = '';
 
+        const filterButton = document.getElementsByClassName('active')[0];
+        if (filterButton.id === 'allButton') {
+            tasks = tasks['tasks'];
+        } else if (filterButton.id === 'activeButton') {
+            tasks = tasks['tasks'].filter(task => !task.completed);
+        } else if (filterButton.id === 'completedButton') {
+            tasks = tasks['tasks'].filter(task => task.completed);
+        }
+
         // Sort tasks so completed tasks appear at the end
-        const sortedTasks = tasks['tasks'].sort((a, b) => {
+        const sortedTasks = tasks.sort((a, b) => {
             if (a.completed && !b.completed) return 1;
             if (!a.completed && b.completed) return -1;
             return 0;
         });
 
-        sortedTasks.forEach(task => {
-            // create a li tag
-            const li = document.createElement('li');
-            li.setAttribute('data-task-id', task.id); // Use data-task-id instead of key
-            if (task.completed) {
-                li.className = 'completed';
-            }
-
-            // create a div tag
-            const taskContent = document.createElement('div');
-            taskContent.className = 'task-content';
-
-            // create a input tag
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.checked = task.completed;
-            input.addEventListener('change', () => completeTask(task));
-            taskContent.appendChild(input);
-
-            // create a span tag
-            const span = document.createElement('span');
-            span.textContent = task.description;
-            taskContent.appendChild(span);
-
-            li.appendChild(taskContent);
-
-            // create a button tag
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = '×';
-            deleteButton.className = 'delete-btn';
-            deleteButton.addEventListener('click', () => deleteTask(task.id));
-            li.appendChild(deleteButton);
-
-            // append the li tag to the todoList
-            todoList.appendChild(li);
-        });
+        displayTasks(sortedTasks, todoList);
 
     } catch (error) {
         console.error('Error fetching tasks:', error);
     }
+}
+
+function displayTasks(sortedTasks, todoList) {
+    sortedTasks.forEach(task => {
+        // create a li tag
+        const li = document.createElement('li');
+        li.setAttribute('data-task-id', task.id); // Use data-task-id instead of key
+        if (task.completed) {
+            li.className = 'completed';
+        }
+
+        // create a div tag
+        const taskContent = document.createElement('div');
+        taskContent.className = 'task-content';
+
+        // create a input tag
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = task.completed;
+        input.addEventListener('change', () => completeTask(task));
+        taskContent.appendChild(input);
+
+        // create a span tag
+        const span = document.createElement('span');
+        span.textContent = task.description;
+        taskContent.appendChild(span);
+
+        li.appendChild(taskContent);
+
+        // create a button tag
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '×';
+        deleteButton.className = 'delete-btn';
+        deleteButton.addEventListener('click', () => deleteTask(task.id));
+        li.appendChild(deleteButton);
+
+        // append the li tag to the todoList
+        todoList.appendChild(li);
+    });
+
+}
+
+function setActiveButton(button) {
+    const filterButtons = document.getElementsByClassName('active');
+    for (let i = 0; i < filterButtons.length; i++) {
+        filterButtons[i].classList.remove('active');
+    }
+    button.classList.add('active');
 }
 
 // Wait for DOM to be fully loaded
@@ -129,8 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addTaskButton = document.getElementById('addTaskButton');
 
     // console.log('DOMContentLoaded');
-    // Call listAllTasks when the page loads
-    listAllTasks();
+    listTasks();
 
     // Add task button event listener
     if (addTaskButton) {
@@ -159,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Data parsed:', data); // Debug log
 
                 // After creating a task, refresh the task list
-                await listAllTasks();
+                await listTasks();
                 // clear the input field
                 document.getElementById('taskInput').value = '';
             } catch (error) {
@@ -169,4 +190,24 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('Add task button not found!');
     }
+
+
+    const allButton = document.getElementById('allButton');
+    const activeButton = document.getElementById('activeButton');
+    const completedButton = document.getElementById('completedButton');
+
+    allButton.addEventListener('click', () => {
+        setActiveButton(allButton);
+        listTasks();
+    });
+
+    activeButton.addEventListener('click', () => {
+        setActiveButton(activeButton);
+        listTasks();
+    });
+
+    completedButton.addEventListener('click', () => {
+        setActiveButton(completedButton);
+        listTasks();
+    });
 });
