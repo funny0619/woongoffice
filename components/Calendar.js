@@ -49,18 +49,32 @@ app.component('calendar', {
     `,
     data() {
         return {
+            // get current year
+            currentDate: new Date(),
+            year: this.currentDate.getFullYear(),
+            lunarCalendar: new KoreanLunarCalendar(),
             specialDates: [
-                { name: "Our 2nd Anniversary", date: "2025-04-13" },
-                { name: "Eunji's Birthday", date: "2025-09-21" },
-                { name: "Sunny's Birthday", date: "2025-06-19" },
-                { name: "World Ice Cream Day", date: "2025-07-21" },
+                { name: "Our 2nd Anniversary", date: this.year + "-04-13" },
+                { name: "Eunji's Birthday", date: this.year + "-09-21" },
+                { name: "Sunny's Birthday", date: this.year + "-06-19" },
+                { name: "World Ice Cream Day", date: this.year + "-07-21" },
+                { name: "Susan's Birthday", date: this.year + "-07-26" },
+                { name: "Danna's Birthday", date: this.year + "-12-07" },
+                { name: "은댕이 어머님 생신", date: this.getSolarDate(this.year, 3, 4) },
+                { name: "은댕이 아버님 생신", date: this.getSolarDate(this.year, 3, 16) },
+                { name: "희주 누나 생일일", date: this.year + "-11-30" },
             ],
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-            currentDate: new Date(),
             selectedDate: null
         }
     },
     computed: {
+        getSolarDate(year, month, day) {
+            var year = this.lunarCalendar.setLunarDate(year, month, day, true).getLunarCalendar().year;
+            var month = this.lunarCalendar.setLunarDate(year, month, day, true).getLunarCalendar().month;
+            var day = this.lunarCalendar.setLunarDate(year, month, day, true).getLunarCalendar().day;
+            return year + "-" + month + "-" + day;
+        },
         currentMonthName() {
             return this.currentDate.toLocaleString('default', { month: 'short' });
         },
