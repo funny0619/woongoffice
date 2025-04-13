@@ -1,11 +1,11 @@
 // Global variable to store tasks
 let globalTasks = [];
-
+let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/api/';
 async function completeTask(task) {
     task.completed = !task.completed;
     // post request to update the task using the id and the completed value
     try {
-        fetch('http://localhost:8000/api/updateTask/', {
+        fetch(url + 'updateTask/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ async function deleteTask(taskId) {
 
     // Send delete request to the backend
     try {
-        fetch('http://localhost:8000/api/deleteTask/', {
+        fetch(url + 'deleteTask/', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ async function listTasks(forceRefresh = false) {
     // Only fetch tasks from API if global tasks is empty or force refresh is true
     if (globalTasks.length === 0 || forceRefresh) {
         try {
-            const response = await fetch('http://localhost:8000/api/listTasks/');
+            const response = await fetch(url + 'listTasks/');
             const data = await response.json();
             globalTasks = data['tasks'];
         } catch (error) {
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 // Send a POST request to the API endpoint with the task description
-                const response = await fetch('http://localhost:8000/api/createTask/', {
+                const response = await fetch(url + 'createTask/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
