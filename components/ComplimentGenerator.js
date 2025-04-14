@@ -99,7 +99,7 @@ app.component('compliment-generator', {
         // Set up interval to generate new compliments
         this.timer = setInterval(() => {
             this.generateCompliment();
-        }, 8000); // Increased interval to account for typing animation
+        }, 5000); // Increased interval to account for typing animation
     },
     beforeUnmount() {
         // Clean up intervals when component is destroyed
