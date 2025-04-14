@@ -1,6 +1,3 @@
-// const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
-const url = 'http://localhost:8000/calendar/';
-
 app.component('calendar', {
     template:
         /*html*/
@@ -8,15 +5,7 @@ app.component('calendar', {
         <div class="calendar-container">
             <div class="countdown-grid mb-4">
                 <h2 class="title is-5 has-text-centered mb-3">중요한 날들</h2>
-                <div v-if="isLoading" class="has-text-centered">
-                    <span class="icon is-large">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </span>
-                </div>
-                <div v-else-if="error" class="notification is-danger">
-                    {{ error }}
-                </div>
-                <div v-else class="columns is-mobile is-multiline">
+                <div class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
                         <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
                             <div class="card-content p-2">
@@ -69,33 +58,37 @@ app.component('calendar', {
             selectedDate: null,
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             lunarCalendar: new KoreanLunarCalendar(),
-            specialDates: [],
-            isLoading: false,
-            error: null
+            specialDates: [
+                { name: "Our Anniversary", month: 4, day: 13, isAnniversary: true },
+                { name: "Eunji's Birthday", month: 9, day: 21 },
+                { name: "Sunny's Birthday", month: 6, day: 19 },
+                { name: "World Ice Cream Day", month: 7, day: 21 },
+                { name: "Susan's Birthday", month: 7, day: 26 },
+                { name: "Danna's Birthday", month: 12, day: 7 },
+                { name: "희주 누나 생일", month: 11, day: 30 },
+                { name: "은댕이 어머님 생신", lunar: { month: 3, day: 4 } },
+                { name: "은댕이 아버님 생신", lunar: { month: 3, day: 16 } }
+            ]
         }
-    },
-    created() {
-        this.fetchSpecialDates();
     },
     computed: {
         processedSpecialDates() {
             const year = this.currentDate.getFullYear();
             return this.specialDates.map(event => {
-                if (event.isRecurring) {
-                    if (event.isLunar) {
-                        return {
-                            name: event.name,
-                            date: this.getLunarDate({ year, month: event.month, day: event.day })
-                        };
-                    } else {
-                        const date = this.toStringDate({ year, month: event.month, day: event.day })
-                        const name = event.isAnniversary ? `Our ${year - 2024 + 1}${this.getOrdinalSuffix(year - 2024 + 1)} Anniversary` : event.name
-                        return {
-                            name: name,
-                            date: date
-                        };
-                    }
+                if (event.isAnniversary) {
+                    const anniversaryYear = 2024; // The year of the first anniversary
+                    const anniversaryNumber = year - anniversaryYear + 1;
+                    return {
+                        name: `Our ${anniversaryNumber}${this.getOrdinalSuffix(anniversaryNumber)} Anniversary`,
+                        date: `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
+                    };
                 }
+                return {
+                    name: event.name,
+                    date: event.lunar ?
+                        this.getLunarDate({ year, ...event.lunar }) :
+                        `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
+                };
             });
         },
         sortedSpecialDates() {
@@ -160,30 +153,10 @@ app.component('calendar', {
         }
     },
     methods: {
-        async fetchSpecialDates() {
-            this.isLoading = true;
-            this.error = null;
-            try {
-                const response = await fetch(url + 'listDates');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch  dates');
-                }
-                const data = await response.json();
-                this.specialDates = data['dates'];
-            } catch (err) {
-                this.error = 'Failed to load special dates. Please try again later.';
-                console.error('Error fetching special dates:', err);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        toStringDate(date) {
-            return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
-        },
         getLunarDate({ year, month, day }) {
-            this.lunarCalendar.setLunarDate(year, month, day, true);
+            this.lunarCalendar.setLunarDate(year, month, day, false);
             const solar = this.lunarCalendar.getSolarCalendar();
-            return this.toStringDate(solar);
+            return `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`;
         },
         formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('en-US', {
