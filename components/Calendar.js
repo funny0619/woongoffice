@@ -1,19 +1,91 @@
+const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
+// const url = 'http://localhost:8000/calendar/';
+
 app.component('calendar', {
     template:
         /*html*/
         `
         <div class="calendar-container">
             <div class="countdown-grid mb-4">
-                <h2 class="title is-5 has-text-centered mb-3">중요한 날들</h2>
-                <div class="columns is-mobile is-multiline">
+                <h2 class="title is-5 has-text-centered mb-3">
+                중요한 날들
+                <button @click="showAddDateModal = true" class="button ml-2 addDateButton">추억 추가 😎</button>
+                </h2>
+                <div v-if="showAddDateModal" class="modal is-active">
+                    <div class="modal-background" @click="showAddDateModal = false"></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <h3 class="title is-5 mb-3">중요한 날 추가</h3>
+                            <div class="field">
+                                <label class="label">날짜</label>
+                                <div class="control">
+                                    <input type="date" v-model="newDate.date" class="input">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">이벤트</label>
+                                <div class="control">
+                                    <input type="text" v-model="newDate.name" class="input" placeholder="이벤트 이름">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">카테고리</label>
+                                <div class="control">
+                                    <select v-model="newDate.category" class="select">
+                                        <option value="Birthday">Birthday</option>
+                                        <option value="Anniversary">Anniversary</option>
+                                        <option value="Special">Special</option>
+                                        <option value="Trip">Trip</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="checkbox">
+                                    <input type="checkbox" v-model="newDate.isLunar">
+                                    Lunar Calendar Date
+                                </label>
+                                <br>
+                                <label class="checkbox">
+                                    <input type="checkbox" v-model="newDate.isRecurring">
+                                    Recurring
+                                </label>
+                            </div>
+                            <div class="field is-grouped is-grouped-right">
+                                <div class="control">
+                                    <button @click="showAddDateModal = false" class="button is-light">Cancel</button>
+                                </div>
+                                <div class="control">
+                                    <button @click="addNewDate" class="button addDateButton">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close" @click="showAddDateModal = false"></button>
+                </div>
+                <div v-if="isLoading" class="has-text-centered">
+                    <span class="icon is-large">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </div>
+                <div v-else-if="error" class="notification is-danger">
+                    {{ error }}
+                </div>
+                <div v-else class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
-                        <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
+                        <div class="card special-date" :data-id="event.id" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
                             <div class="card-content p-2">
                                 <div class="is-flex is-justify-content-space-between is-align-items-center">
                                     <span class="title is-6 mb-0">{{ event.name }}</span>
                                     <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }}</span>
                                 </div>
-                                <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+                                    <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
+                                    <button @click.stop="deleteDate(event)" class="button is-small is-danger is-light">
+                                        <span class="icon is-small">
+                                        <img src="./assets/images/trash.png" alt="delete" style="width: 16px; height: 16px;">
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -58,46 +130,70 @@ app.component('calendar', {
             selectedDate: null,
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             lunarCalendar: new KoreanLunarCalendar(),
+            showAddDateModal: false,
+            newDate: {
+                date: '',
+                name: '',
+                category: 'Special',
+                isLunar: false
+            },
             specialDates: [
-                { name: "Our Anniversary", month: 4, day: 13, isAnniversary: true },
-                { name: "Eunji's Birthday", month: 9, day: 21 },
-                { name: "Sunny's Birthday", month: 6, day: 19 },
-                { name: "World Ice Cream Day", month: 7, day: 21 },
-                { name: "Susan's Birthday", month: 7, day: 26 },
-                { name: "Danna's Birthday", month: 12, day: 7 },
-                { name: "희주 누나 생일일", month: 11, day: 30 },
-                { name: "은댕이 어머님 생신", lunar: { month: 3, day: 4 } },
-                { name: "은댕이 아버님 생신", lunar: { month: 3, day: 16 } }
-            ]
+            ],
+            isLoading: false,
+            error: null
         }
+    },
+    created() {
+        this.fetchSpecialDates();
     },
     computed: {
         processedSpecialDates() {
             const year = this.currentDate.getFullYear();
             return this.specialDates.map(event => {
-                if (event.isAnniversary) {
-                    const anniversaryYear = 2024; // The year of the first anniversary
-                    const anniversaryNumber = year - anniversaryYear + 1;
+                if (event.isRecurring) {
+                    if (event.isLunar) {
+                        return {
+                            id: event.id,
+                            name: event.name,
+                            date: this.getLunarDate({ year, month: event.month, day: event.day }),
+                            category: event.category
+                        };
+                    } else {
+                        const date = this.toStringDate({ year, month: event.month, day: event.day })
+                        const name = event.isAnniversary ? `Our ${year - 2024 + 1}${this.getOrdinalSuffix(year - 2024 + 1)} Anniversary` : event.name
+                        return {
+                            id: event.id,
+                            name: name,
+                            date: date,
+                            category: event.category
+                        };
+                    }
+                } else {
                     return {
-                        name: `Our ${anniversaryNumber}${this.getOrdinalSuffix(anniversaryNumber)} Anniversary`,
-                        date: `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
+                        id: event.id,
+                        name: event.name,
+                        date: this.toStringDate({ year, month: event.month, day: event.day }),
+                        category: event.category
                     };
                 }
-                return {
-                    name: event.name,
-                    date: event.lunar ?
-                        this.getLunarDate({ year, ...event.lunar }) :
-                        `${year}-${String(event.month).padStart(2, '0')}-${String(event.day).padStart(2, '0')}`
-                };
             });
         },
         sortedSpecialDates() {
             const now = new Date();
             return this.processedSpecialDates
-                .map(event => ({
-                    ...event,
-                    daysRemaining: Math.ceil((new Date(event.date) - now) / (1000 * 60 * 60 * 24))
-                }))
+                .map(event => {
+                    const eventDate = new Date(event.date);
+                    const diffTime = eventDate - now;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const isSameDay = eventDate.getDate() === now.getDate() &&
+                        eventDate.getMonth() === now.getMonth() &&
+                        eventDate.getFullYear() === now.getFullYear();
+
+                    return {
+                        ...event,
+                        daysRemaining: isSameDay ? 0 : diffDays
+                    };
+                })
                 .filter(event => event.daysRemaining >= 0)
                 .map(event => ({
                     ...event,
@@ -153,10 +249,75 @@ app.component('calendar', {
         }
     },
     methods: {
+        async fetchSpecialDates() {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await fetch(url + 'listDates');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch  dates');
+                }
+                const data = await response.json();
+                // append data to specialDates
+                this.specialDates.push(...data['dates']);
+            } catch (err) {
+                this.error = 'Failed to load special dates. Please try again later.';
+                console.error('Error fetching special dates:', err);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async addNewDate() {
+            if (!this.newDate.date || !this.newDate.name) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const date = new Date(this.newDate.date);
+            const newSpecialDate = {
+                name: this.newDate.name,
+                month: date.getMonth() + 1,
+                day: date.getDate(),
+                isLunar: this.newDate.isLunar,
+                isRecurring: this.newDate.isRecurring,
+                isAnniversary: false,
+                category: this.newDate.category
+            };
+
+            try {
+                const response = await fetch(url + 'createDate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newSpecialDate)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add date');
+                }
+                const data = await response.json();
+                const newItem = data['new_item'];
+                this.specialDates.push(newItem);
+                this.showAddDateModal = false;
+                this.newDate = {
+                    date: '',
+                    name: '',
+                    category: 'Special',
+                    isLunar: false
+                };
+            } catch (err) {
+                console.error('Error adding date:', err);
+                alert('Failed to add date. Please try again.');
+            }
+        },
+        toStringDate(date) {
+            return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+        },
         getLunarDate({ year, month, day }) {
-            this.lunarCalendar.setLunarDate(year, month, day, false);
+            this.lunarCalendar.setLunarDate(year, month, day, true);
             const solar = this.lunarCalendar.getSolarCalendar();
-            return `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`;
+            return this.toStringDate(solar);
         },
         formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('en-US', {
@@ -215,6 +376,33 @@ app.component('calendar', {
             const suffixes = ['th', 'st', 'nd', 'rd'];
             const v = number % 100;
             return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
+        },
+        async deleteDate(event) {
+            if (!confirm('진짜 지우꼬양~?')) {
+                return;
+            }
+
+            try {
+                console.log(event.id);
+                const response = await fetch(url + 'deleteDate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `id=${encodeURIComponent(event.id)}&category=${encodeURIComponent(event.category)}`
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete date');
+                }
+
+                // Remove the date from the specialDates array using the ID
+                this.specialDates = this.specialDates.filter(date => date.id !== event.id);
+                // console.log(event);
+            } catch (err) {
+                console.error('Error deleting date:', err);
+                alert('Failed to delete date. Please try again.');
+            }
         }
     }
 })

@@ -1,6 +1,7 @@
 // Global variable to store tasks
 let globalTasks = [];
-let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/';
+// let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/todo/';
+let url = 'http://localhost:8000/todo/';
 async function completeTask(task) {
     task.completed = !task.completed;
     // post request to update the task using the id and the completed value
@@ -100,7 +101,6 @@ async function listTasks(forceRefresh = false) {
             return;
         }
     }
-
     const todoList = document.getElementsByClassName('todo-list')[0]; // get the ul tag
     todoList.innerHTML = '';
 
@@ -182,10 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addTaskButton) {
         addTaskButton.addEventListener('click', async () => {
             try {
-                var guid = () => {
-                    var w = () => { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); }
-                    return `${w()}${w()}-${w()}-${w()}-${w()}-${w()}${w()}${w()}`;
-                }
                 // Check if the input field is empty or contains only whitespace
                 if (document.getElementById('taskInput').value.trim() === '') {
                     return;
@@ -193,12 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Create the new task object
                 const newTask = {
-                    id: guid(),
                     description: document.getElementById('taskInput').value,
                     completed: false
                 };
 
-                const formBody = `id=${encodeURIComponent(newTask.id)}&description=${encodeURIComponent(newTask.description)}&completed=${newTask.completed}`;
+                const formBody = `description=${encodeURIComponent(newTask.description)}&completed=${newTask.completed}`;
                 // Send a POST request to the API endpoint with the task description
                 const response = await fetch(url + 'createTask', {
                     method: 'POST',
@@ -210,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
+                newTask.id = data['created_item']['id'];
                 // Add the new task to global tasks array
                 globalTasks.push(newTask);
 
