@@ -7,7 +7,61 @@ app.component('calendar', {
         `
         <div class="calendar-container">
             <div class="countdown-grid mb-4">
-                <h2 class="title is-5 has-text-centered mb-3">중요한 날들</h2>
+                <h2 class="title is-5 has-text-centered mb-3">
+                중요한 날들
+                <button @click="showAddDateModal = true" class="button is-small is-primary ml-2">Add Date</button>
+                </h2>
+                <div v-if="showAddDateModal" class="modal is-active">
+                    <div class="modal-background" @click="showAddDateModal = false"></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <h3 class="title is-5 mb-3">Add Important Date</h3>
+                            <div class="field">
+                                <label class="label">Date</label>
+                                <div class="control">
+                                    <input type="date" v-model="newDate.date" class="input">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Name</label>
+                                <div class="control">
+                                    <input type="text" v-model="newDate.name" class="input" placeholder="Event name">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Category</label>
+                                <div class="control">
+                                    <select v-model="newDate.category" class="select">
+                                        <option value="Birthday">Birthday</option>
+                                        <option value="Anniversary">Anniversary</option>
+                                        <option value="Special">Special</option>
+                                        <option value="Trip">Trip</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="checkbox">
+                                    <input type="checkbox" v-model="newDate.isLunar">
+                                    Lunar Calendar Date
+                                </label>
+                                <br>
+                                <label class="checkbox">
+                                    <input type="checkbox" v-model="newDate.isRecurring">
+                                    Recurring
+                                </label>
+                            </div>
+                            <div class="field is-grouped is-grouped-right">
+                                <div class="control">
+                                    <button @click="showAddDateModal = false" class="button is-light">Cancel</button>
+                                </div>
+                                <div class="control">
+                                    <button @click="addNewDate" class="button is-primary">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close" @click="showAddDateModal = false"></button>
+                </div>
                 <div v-if="isLoading" class="has-text-centered">
                     <span class="icon is-large">
                         <i class="fas fa-spinner fa-spin"></i>
@@ -24,7 +78,7 @@ app.component('calendar', {
                                     <span class="title is-6 mb-0">{{ event.name }}</span>
                                     <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }}</span>
                                 </div>
-                                <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
+                                <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }} </p>
                             </div>
                         </div>
                     </div>
@@ -69,7 +123,105 @@ app.component('calendar', {
             selectedDate: null,
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             lunarCalendar: new KoreanLunarCalendar(),
-            specialDates: [],
+            showAddDateModal: false,
+            newDate: {
+                date: '',
+                name: '',
+                category: 'Special',
+                isLunar: false
+            },
+            specialDates: [
+                {
+                    "name": "Our Anniversary",
+                    "month": 4,
+                    "day": 13,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": true,
+                    "category": "Anniversary"
+                },
+                {
+                    "name": "Eunji's Birthday",
+                    "month": 9,
+                    "day": 21,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "Sunny's Birthday",
+                    "month": 6,
+                    "day": 19,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "Susan's Birthday",
+                    "month": 7,
+                    "day": 26,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "Danna's Birthday",
+                    "month": 12,
+                    "day": 7,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "희주 누나 생일",
+                    "month": 11,
+                    "day": 30,
+                    "isLunar": true,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "은댕이 어머님 생신",
+                    "month": 3,
+                    "day": 4,
+                    "isLunar": true,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "은댕이 아버님 생신",
+                    "month": 3,
+                    "day": 16,
+                    "isLunar": true,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "웅이 엄마 생일",
+                    "month": 2,
+                    "day": 26,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                },
+                {
+                    "name": "웅이 아빠 생일",
+                    "month": 6,
+                    "day": 1,
+                    "isLunar": false,
+                    "isRecurring": true,
+                    "isAnniversary": false,
+                    "category": "Birthday"
+                }
+            ],
             isLoading: false,
             error: null
         }
@@ -95,6 +247,11 @@ app.component('calendar', {
                             date: date
                         };
                     }
+                } else {
+                    return {
+                        name: event.name,
+                        date: this.toStringDate({ year, month: event.month, day: event.day })
+                    };
                 }
             });
         },
@@ -169,12 +326,56 @@ app.component('calendar', {
                     throw new Error('Failed to fetch  dates');
                 }
                 const data = await response.json();
-                this.specialDates = data['dates'];
+                // append data to specialDates
+                this.specialDates.push(...data['dates']);
             } catch (err) {
                 this.error = 'Failed to load special dates. Please try again later.';
                 console.error('Error fetching special dates:', err);
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async addNewDate() {
+            if (!this.newDate.date || !this.newDate.name) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const date = new Date(this.newDate.date);
+            const newSpecialDate = {
+                name: this.newDate.name,
+                month: date.getMonth() + 1,
+                day: date.getDate(),
+                isLunar: this.newDate.isLunar,
+                isRecurring: this.newDate.isRecurring,
+                isAnniversary: false,
+                category: this.newDate.category
+            };
+
+            try {
+                const response = await fetch(url + 'createDate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newSpecialDate)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add date');
+                }
+
+                this.specialDates.push(newSpecialDate);
+                this.showAddDateModal = false;
+                this.newDate = {
+                    date: '',
+                    name: '',
+                    category: 'Special',
+                    isLunar: false
+                };
+            } catch (err) {
+                console.error('Error adding date:', err);
+                alert('Failed to add date. Please try again.');
             }
         },
         toStringDate(date) {
