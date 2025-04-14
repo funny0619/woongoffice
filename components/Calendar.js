@@ -181,10 +181,19 @@ app.component('calendar', {
         sortedSpecialDates() {
             const now = new Date();
             return this.processedSpecialDates
-                .map(event => ({
-                    ...event,
-                    daysRemaining: Math.ceil((new Date(event.date) - now) / (1000 * 60 * 60 * 24))
-                }))
+                .map(event => {
+                    const eventDate = new Date(event.date);
+                    const diffTime = eventDate - now;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const isSameDay = eventDate.getDate() === now.getDate() &&
+                        eventDate.getMonth() === now.getMonth() &&
+                        eventDate.getFullYear() === now.getFullYear();
+
+                    return {
+                        ...event,
+                        daysRemaining: isSameDay ? 0 : diffDays
+                    };
+                })
                 .filter(event => event.daysRemaining >= 0)
                 .map(event => ({
                     ...event,
@@ -369,7 +378,7 @@ app.component('calendar', {
             return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
         },
         async deleteDate(event) {
-            if (!confirm('Are you sure you want to delete this date?')) {
+            if (!confirm('진짜 지우꼬양~?')) {
                 return;
             }
 
