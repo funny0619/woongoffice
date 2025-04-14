@@ -72,13 +72,20 @@ app.component('calendar', {
                 </div>
                 <div v-else class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
-                        <div class="card" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
+                        <div class="card special-date" :data-id="event.id" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
                             <div class="card-content p-2">
                                 <div class="is-flex is-justify-content-space-between is-align-items-center">
                                     <span class="title is-6 mb-0">{{ event.name }}</span>
                                     <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }}</span>
                                 </div>
-                                <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }} </p>
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+                                    <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
+                                    <button @click.stop="deleteDate(event)" class="button is-small is-danger is-light">
+                                        <span class="icon is-small">
+                                        <img src="./assets/images/trash.png" alt="delete" style="width: 16px; height: 16px;">
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,96 +138,6 @@ app.component('calendar', {
                 isLunar: false
             },
             specialDates: [
-                {
-                    "name": "Our Anniversary",
-                    "month": 4,
-                    "day": 13,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": true,
-                    "category": "Anniversary"
-                },
-                {
-                    "name": "Eunji's Birthday",
-                    "month": 9,
-                    "day": 21,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "Sunny's Birthday",
-                    "month": 6,
-                    "day": 19,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "Susan's Birthday",
-                    "month": 7,
-                    "day": 26,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "Danna's Birthday",
-                    "month": 12,
-                    "day": 7,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "희주 누나 생일",
-                    "month": 11,
-                    "day": 30,
-                    "isLunar": true,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "은댕이 어머님 생신",
-                    "month": 3,
-                    "day": 4,
-                    "isLunar": true,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "은댕이 아버님 생신",
-                    "month": 3,
-                    "day": 16,
-                    "isLunar": true,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "웅이 엄마 생일",
-                    "month": 2,
-                    "day": 26,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                },
-                {
-                    "name": "웅이 아빠 생일",
-                    "month": 6,
-                    "day": 1,
-                    "isLunar": false,
-                    "isRecurring": true,
-                    "isAnniversary": false,
-                    "category": "Birthday"
-                }
             ],
             isLoading: false,
             error: null
@@ -236,21 +153,27 @@ app.component('calendar', {
                 if (event.isRecurring) {
                     if (event.isLunar) {
                         return {
+                            id: event.id,
                             name: event.name,
-                            date: this.getLunarDate({ year, month: event.month, day: event.day })
+                            date: this.getLunarDate({ year, month: event.month, day: event.day }),
+                            category: event.category
                         };
                     } else {
                         const date = this.toStringDate({ year, month: event.month, day: event.day })
                         const name = event.isAnniversary ? `Our ${year - 2024 + 1}${this.getOrdinalSuffix(year - 2024 + 1)} Anniversary` : event.name
                         return {
+                            id: event.id,
                             name: name,
-                            date: date
+                            date: date,
+                            category: event.category
                         };
                     }
                 } else {
                     return {
+                        id: event.id,
                         name: event.name,
-                        date: this.toStringDate({ year, month: event.month, day: event.day })
+                        date: this.toStringDate({ year, month: event.month, day: event.day }),
+                        category: event.category
                     };
                 }
             });
@@ -443,6 +366,33 @@ app.component('calendar', {
             const suffixes = ['th', 'st', 'nd', 'rd'];
             const v = number % 100;
             return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
+        },
+        async deleteDate(event) {
+            if (!confirm('Are you sure you want to delete this date?')) {
+                return;
+            }
+
+            try {
+                console.log(event.id);
+                const response = await fetch(url + 'deleteDate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `id=${encodeURIComponent(event.id)}&category=${encodeURIComponent(event.category)}`
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete date');
+                }
+
+                // Remove the date from the specialDates array using the ID
+                this.specialDates = this.specialDates.filter(date => date.id !== event.id);
+                // console.log(event);
+            } catch (err) {
+                console.error('Error deleting date:', err);
+                alert('Failed to delete date. Please try again.');
+            }
         }
     }
 })
