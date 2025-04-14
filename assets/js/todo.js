@@ -1,7 +1,7 @@
 // Global variable to store tasks
 let globalTasks = [];
-// let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/todo/';
-let url = 'http://localhost:8000/todo/';
+let url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/todo/';
+// let url = 'http://localhost:8000/todo/';
 async function completeTask(task) {
     task.completed = !task.completed;
     // post request to update the task using the id and the completed value
