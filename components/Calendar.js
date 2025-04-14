@@ -1,5 +1,5 @@
-// const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
-const url = 'http://localhost:8000/calendar/';
+const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
+// const url = 'http://localhost:8000/calendar/';
 
 app.component('calendar', {
     template:
@@ -9,27 +9,27 @@ app.component('calendar', {
             <div class="countdown-grid mb-4">
                 <h2 class="title is-5 has-text-centered mb-3">
                 중요한 날들
-                <button @click="showAddDateModal = true" class="button is-small is-primary ml-2">Add Date</button>
+                <button @click="showAddDateModal = true" class="button ml-2 addDateButton">추억 추가 😎</button>
                 </h2>
                 <div v-if="showAddDateModal" class="modal is-active">
                     <div class="modal-background" @click="showAddDateModal = false"></div>
                     <div class="modal-content">
                         <div class="box">
-                            <h3 class="title is-5 mb-3">Add Important Date</h3>
+                            <h3 class="title is-5 mb-3">중요한 날 추가</h3>
                             <div class="field">
-                                <label class="label">Date</label>
+                                <label class="label">날짜</label>
                                 <div class="control">
                                     <input type="date" v-model="newDate.date" class="input">
                                 </div>
                             </div>
                             <div class="field">
-                                <label class="label">Name</label>
+                                <label class="label">이벤트</label>
                                 <div class="control">
-                                    <input type="text" v-model="newDate.name" class="input" placeholder="Event name">
+                                    <input type="text" v-model="newDate.name" class="input" placeholder="이벤트 이름">
                                 </div>
                             </div>
                             <div class="field">
-                                <label class="label">Category</label>
+                                <label class="label">카테고리</label>
                                 <div class="control">
                                     <select v-model="newDate.category" class="select">
                                         <option value="Birthday">Birthday</option>
@@ -55,7 +55,7 @@ app.component('calendar', {
                                     <button @click="showAddDateModal = false" class="button is-light">Cancel</button>
                                 </div>
                                 <div class="control">
-                                    <button @click="addNewDate" class="button is-primary">Add</button>
+                                    <button @click="addNewDate" class="button addDateButton">Add</button>
                                 </div>
                             </div>
                         </div>
@@ -287,8 +287,9 @@ app.component('calendar', {
                 if (!response.ok) {
                     throw new Error('Failed to add date');
                 }
-
-                this.specialDates.push(newSpecialDate);
+                const data = await response.json();
+                const newItem = data['new_item'];
+                this.specialDates.push(newItem);
                 this.showAddDateModal = false;
                 this.newDate = {
                     date: '',

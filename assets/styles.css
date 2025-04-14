@@ -197,6 +197,19 @@ button {
   color: #000000 !important;
 }
 
+.addDateButton {
+  color: #000000 !important;
+  background-color: #FBBF24;
+}
+
+/* Center the h2 content vertically */
+.title.is-5.has-text-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 button:hover {
   background-color: #FBBF24;
 }
