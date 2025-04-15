@@ -1,5 +1,5 @@
-const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
-// const url = 'http://localhost:8000/calendar/';
+// const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
+const url = 'http://localhost:8000/calendar/';
 
 app.component('calendar', {
     template:
@@ -42,12 +42,12 @@ app.component('calendar', {
                             <div class="field">
                                 <label class="checkbox">
                                     <input type="checkbox" v-model="newDate.isLunar">
-                                    Lunar Calendar Date
+                                    음력
                                 </label>
                                 <br>
                                 <label class="checkbox">
                                     <input type="checkbox" v-model="newDate.isRecurring">
-                                    Recurring
+                                    반복
                                 </label>
                             </div>
                             <div class="field is-grouped is-grouped-right">
@@ -135,7 +135,8 @@ app.component('calendar', {
                 date: '',
                 name: '',
                 category: 'Special',
-                isLunar: false
+                isLunar: false,
+                isRecurring: false
             },
             specialDates: [
             ],
@@ -156,7 +157,8 @@ app.component('calendar', {
                             id: event.id,
                             name: event.name,
                             date: this.getLunarDate({ year, month: event.month, day: event.day }),
-                            category: event.category
+                            category: event.category,
+                            isRecurring: event.isRecurring,
                         };
                     } else {
                         const date = this.toStringDate({ year, month: event.month, day: event.day })
@@ -165,30 +167,39 @@ app.component('calendar', {
                             id: event.id,
                             name: name,
                             date: date,
-                            category: event.category
+                            category: event.category,
+                            isRecurring: event.isRecurring,
                         };
                     }
                 } else {
                     return {
                         id: event.id,
                         name: event.name,
-                        date: this.toStringDate({ year, month: event.month, day: event.day }),
-                        category: event.category
+                        date: this.toStringDate({ year: event.year, month: event.month, day: event.day }),
+                        category: event.category,
+                        isRecurring: event.isRecurring,
                     };
                 }
             });
         },
         sortedSpecialDates() {
             const now = new Date();
+            // console.log(this.processedSpecialDates);
             return this.processedSpecialDates
                 .map(event => {
-                    const eventDate = new Date(event.date);
+                    let eventDate;
+                    if (event.isRecurring) {
+                        eventDate = new Date(event.date);
+                    } else {
+                        const date = event.date.split('-');
+                        eventDate = new Date(now.getFullYear(), date[1] - 1, date[2]);
+                    }
                     const diffTime = eventDate - now;
+                    // console.log(eventDate);
                     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     const isSameDay = eventDate.getDate() === now.getDate() &&
                         eventDate.getMonth() === now.getMonth() &&
                         eventDate.getFullYear() === now.getFullYear();
-
                     return {
                         ...event,
                         daysRemaining: isSameDay ? 0 : diffDays
@@ -283,7 +294,9 @@ app.component('calendar', {
                 isAnniversary: false,
                 category: this.newDate.category
             };
-
+            if (this.newDate.isRecurring) {
+                newSpecialDate['year'] = date.getFullYear();
+            }
             try {
                 const response = await fetch(url + 'createDate', {
                     method: 'POST',
