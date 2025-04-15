@@ -160,6 +160,14 @@ app.component('calendar', {
                     this.newDate.endDate = newVal;
                 }
             }
+        },
+        'newDate.endDate': function (newVal) {
+            if (newVal && this.newDate.date) {
+                // If end date is before start date, reset it to start date
+                if (new Date(newVal) < new Date(this.newDate.date)) {
+                    this.newDate.endDate = this.newDate.date;
+                }
+            }
         }
     },
     created() {
@@ -209,8 +217,9 @@ app.component('calendar', {
                 return solar;
             }
             const now = new Date();
-            // console.log(this.specialDates)
-            const sortedDates = this.specialDates
+
+            // First, process all events to calculate days remaining
+            const processedEvents = this.specialDates
                 .map(event => {
                     let year = event.isRecurring ? now.getFullYear() : event.year;
                     let month = event.month;
@@ -232,7 +241,24 @@ app.component('calendar', {
                         ...event,
                         daysRemaining: isSameDay ? 0 : diffDays
                     };
-                }).filter(event => event.daysRemaining >= 0)
+                })
+                .filter(event => event.daysRemaining >= 0);
+
+            // Group events by groupId and select the one with minimum days remaining
+            const groupedEvents = processedEvents.reduce((acc, event) => {
+                if (event.isGroup && event.groupId) {
+                    if (!acc[event.groupId] || event.daysRemaining < acc[event.groupId].daysRemaining) {
+                        acc[event.groupId] = event;
+                    }
+                } else {
+                    // For non-grouped events, use a unique key
+                    acc[`single_${event.id}`] = event;
+                }
+                return acc;
+            }, {});
+
+            // Convert grouped events back to array and sort
+            const sortedDates = Object.values(groupedEvents)
                 .map(event => ({
                     ...event,
                     daysRemaining: event.daysRemaining === 0 ? 'Today' : `${event.daysRemaining} days`
@@ -314,55 +340,111 @@ app.component('calendar', {
             }
 
             const date = new Date(this.newDate.date);
-            const endDate = new Date(this.newDate.endDate).getTime();
+            const endDate = new Date(this.newDate.endDate);
 
-            const newSpecialDate = {
-                name: this.newDate.name,
-                month: date.getMonth() + 1,
-                day: date.getDate(),
-                isLunar: this.newDate.isLunar,
-                isRecurring: this.newDate.isRecurring,
-                isAnniversary: false, // Anniverary will not change
-                category: this.newDate.category
-            };
-
-            if (!this.newDate.isRecurring) {
-                newSpecialDate['year'] = date.getFullYear();
-            }
-
-            // if (date != endDate) {
-
-
-            //     newSpecialDate['endDate'] = endDate;
-            // }
-
-
-            try {
-                const response = await fetch(url + 'createDate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(newSpecialDate)
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to add date');
+            // check if theyre not the same date
+            if (endDate > date) {
+                // send a list of dates between the start and end date
+                // console.log(date, endDate);
+                const dates = []
+                let currentDate = new Date(date);
+                while (currentDate <= endDate) {
+                    if (this.newDate.isRecurring) {
+                        dates.push({ month: currentDate.getMonth() + 1, day: currentDate.getDate() });
+                    } else {
+                        dates.push({ year: currentDate.getFullYear(), month: currentDate.getMonth() + 1, day: currentDate.getDate() });
+                    }
+                    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
                 }
-                const data = await response.json();
-                const newItem = data['new_item'];
-                this.specialDates.push(newItem);
-                this.showAddDateModal = false;
-                this.newDate = {
-                    date: '',
-                    name: '',
-                    category: 'Special',
-                    isLunar: false
+
+                const newSpecialDates = {
+                    name: this.newDate.name,
+                    isLunar: this.newDate.isLunar,
+                    isRecurring: this.newDate.isRecurring,
+                    isAnniversary: false, // Anniverary will not change
+                    category: this.newDate.category,
+                    dates: dates,
+                    isGroup: true
+                }
+
+                // console.log(newSpecialDates);
+                try {
+                    const response = await fetch(url + 'createDate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(newSpecialDates)
+                    });
+                    const data = await response.json();
+                    const groupId = data['groupId'];
+                    const createdDates = data['created_dates'];
+                    for (const date of createdDates) {
+                        this.specialDates.push({
+                            ...date,
+                            groupId: groupId
+                        });
+                    }
+
+                    if (!response.ok) {
+                        throw new Error('Failed to add date');
+                    }
+                    this.showAddDateModal = false;
+                    this.newDate = {
+                        date: '',
+                        endDate: '',
+                        name: '',
+                        category: 'Special',
+                        isLunar: false,
+                        isRecurring: false,
+                    };
+                } catch (err) {
+                    console.error('Error adding date:', err);
+                    alert('Failed to add date. Please try again.');
+                }
+            } else {
+
+                const newSpecialDate = {
+                    name: this.newDate.name,
+                    month: date.getMonth() + 1,
+                    day: date.getDate(),
+                    isLunar: this.newDate.isLunar,
+                    isRecurring: this.newDate.isRecurring,
+                    isAnniversary: false, // Anniverary will not change
+                    category: this.newDate.category
                 };
-            } catch (err) {
-                console.error('Error adding date:', err);
-                alert('Failed to add date. Please try again.');
+
+                if (!this.newDate.isRecurring) {
+                    newSpecialDate['year'] = date.getFullYear();
+                }
+                try {
+                    const response = await fetch(url + 'createDate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(newSpecialDate)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to add date');
+                    }
+                    const data = await response.json();
+
+                    this.specialDates.push(data['new_item']);
+                    this.showAddDateModal = false;
+                    this.newDate = {
+                        date: '',
+                        name: '',
+                        category: 'Special',
+                        isLunar: false
+                    };
+                } catch (err) {
+                    console.error('Error adding date:', err);
+                    alert('Failed to add date. Please try again.');
+                }
             }
+
         },
         toStringDate(date) {
             return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
@@ -444,26 +526,46 @@ app.component('calendar', {
             return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
         },
         async deleteDate(event) {
+            // Todo add event name
             if (!confirm('진짜 지우꼬양~?')) {
                 return;
             }
 
             try {
+                console.log(event);
                 // console.log(event.id);
-                const response = await fetch(url + 'deleteDate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `id=${encodeURIComponent(event.id)}&category=${encodeURIComponent(event.category)}`
-                });
+                if (event.isGroup) {
+                    const response = await fetch(url + 'deleteDate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ isGroup: true, groupId: event.groupId })
+                    });
 
-                if (!response.ok) {
-                    throw new Error('Failed to delete date');
+                    if (!response.ok) {
+                        throw new Error('Failed to delete date');
+                    }
+                    // Remove the date from the specialDates array using the groupId
+                    this.specialDates = this.specialDates.filter(date => date.groupId !== event.groupId);
+                }
+                else {
+                    const response = await fetch(url + 'deleteDate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ isGroup: false, id: event.id, category: event.category })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete date');
+                    }
+                    // Remove the date from the specialDates array using the ID
+                    this.specialDates = this.specialDates.filter(date => date.id !== event.id);
                 }
 
-                // Remove the date from the specialDates array using the ID
-                this.specialDates = this.specialDates.filter(date => date.id !== event.id);
+
                 // console.log(event);
             } catch (err) {
                 console.error('Error deleting date:', err);
