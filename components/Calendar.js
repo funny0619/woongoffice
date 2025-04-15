@@ -225,8 +225,8 @@ app.component('calendar', {
                         eventDate = new Date(year, month - 1, day);
                     }
 
-                    const diffTime = eventDate - now;
-                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const diffTime = eventDate.getTime() - now.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     const isSameDay = eventDate.getTime() === now.getTime();
                     return {
                         ...event,
