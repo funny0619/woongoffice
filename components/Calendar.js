@@ -17,9 +17,15 @@ app.component('calendar', {
                         <div class="box">
                             <h3 class="title is-5 mb-3">중요한 날 추가</h3>
                             <div class="field">
-                                <label class="label">날짜</label>
+                                <label class="label">날짜 시작</label>
                                 <div class="control">
-                                    <input type="date" v-model="newDate.date" class="input">
+                                    <input type="date" v-model="newDate.date" class="input" id="startDate">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">날짜 끝</label>
+                                <div class="control">
+                                    <input type="date" v-model="newDate.endDate" class="input" >
                                 </div>
                             </div>
                             <div class="field">
@@ -31,7 +37,7 @@ app.component('calendar', {
                             <div class="field">
                                 <label class="label">카테고리</label>
                                 <div class="control">
-                                    <select v-model="newDate.category" class="select">
+                                    <select v-model="newDate.category" class="select is-small">
                                         <option value="Birthday">Birthday</option>
                                         <option value="Anniversary">Anniversary</option>
                                         <option value="Special">Special</option>
@@ -63,7 +69,7 @@ app.component('calendar', {
                     <button class="modal-close is-large" aria-label="close" @click="showAddDateModal = false"></button>
                 </div>
                 <div v-if="isLoading" class="has-text-centered">
-                    <span class="icon is-large">
+                    <span class="icon is-small">
                         <i class="fas fa-spinner fa-spin"></i>
                     </span>
                 </div>
@@ -72,14 +78,14 @@ app.component('calendar', {
                 </div>
                 <div v-else class="columns is-mobile is-multiline">
                     <div v-for="(event, index) in sortedSpecialDates" :key="index" class="column is-full-mobile is-half-tablet">
-                        <div class="card special-date" :data-id="event.id" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event.date)">
+                        <div class="card special-date" :data-id="event.id" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;" @click="jumpToDate(event)">
                             <div class="card-content p-2">
                                 <div class="is-flex is-justify-content-space-between is-align-items-center">
                                     <span class="title is-6 mb-0">{{ event.name }}</span>
                                     <span class="subtitle is-7 has-text-primary">{{ event.daysRemaining }}</span>
                                 </div>
                                 <div class="is-flex is-justify-content-space-between is-align-items-center">
-                                    <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event.date) }}</p>
+                                    <p class="has-text-grey is-size-7 mt-1">{{ formatDate(event) }}</p>
                                     <button @click.stop="deleteDate(event)" class="button is-small is-danger is-light">
                                         <span class="icon is-small">
                                         <img src="./assets/images/trash.png" alt="delete" style="width: 16px; height: 16px;">
@@ -126,6 +132,7 @@ app.component('calendar', {
     `,
     data() {
         return {
+            currentViewingDate: new Date(),
             currentDate: new Date(),
             selectedDate: null,
             weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -133,10 +140,11 @@ app.component('calendar', {
             showAddDateModal: false,
             newDate: {
                 date: '',
+                endDate: '',
                 name: '',
                 category: 'Special',
                 isLunar: false,
-                isRecurring: false
+                isRecurring: false,
             },
             specialDates: [
             ],
@@ -144,19 +152,30 @@ app.component('calendar', {
             error: null
         }
     },
+    watch: {
+        'newDate.date': function (newVal) {
+            if (newVal) {
+                // Only update end date if it's empty or if start date is greater than end date
+                if (!this.newDate.endDate || new Date(newVal) > new Date(this.newDate.endDate)) {
+                    this.newDate.endDate = newVal;
+                }
+            }
+        }
+    },
     created() {
         this.fetchSpecialDates();
     },
     computed: {
         processedSpecialDates() {
-            const year = this.currentDate.getFullYear();
+            const year = this.currentViewingDate.getFullYear();
+            // console.log(this.specialDates);
             return this.specialDates.map(event => {
                 if (event.isRecurring) {
                     if (event.isLunar) {
                         return {
                             id: event.id,
                             name: event.name,
-                            date: this.getLunarDate({ year, month: event.month, day: event.day }),
+                            date: this.getSolarFromLunar({ year, month: event.month, day: event.day }),
                             category: event.category,
                             isRecurring: event.isRecurring,
                         };
@@ -183,29 +202,37 @@ app.component('calendar', {
             });
         },
         sortedSpecialDates() {
+            const lunarCalendarHelper = new KoreanLunarCalendar();
+            function getSolarFromLunar({ year, month, day }) {
+                lunarCalendarHelper.setLunarDate(year, month, day, true);
+                const solar = lunarCalendarHelper.getSolarCalendar();
+                return solar;
+            }
             const now = new Date();
-            // console.log(this.processedSpecialDates);
-            return this.processedSpecialDates
+            // console.log(this.specialDates)
+            const sortedDates = this.specialDates
                 .map(event => {
+                    let year = event.isRecurring ? now.getFullYear() : event.year;
+                    let month = event.month;
+                    let day = event.day;
+
                     let eventDate;
-                    if (event.isRecurring) {
-                        eventDate = new Date(event.date);
+
+                    if (event.isLunar) {
+                        const lunarDate = getSolarFromLunar({ year, month, day })
+                        eventDate = new Date(lunarDate.year, lunarDate.month - 1, lunarDate.day);
                     } else {
-                        const date = event.date.split('-');
-                        eventDate = new Date(now.getFullYear(), date[1] - 1, date[2]);
+                        eventDate = new Date(year, month - 1, day);
                     }
+
                     const diffTime = eventDate - now;
-                    // console.log(eventDate);
                     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                    const isSameDay = eventDate.getDate() === now.getDate() &&
-                        eventDate.getMonth() === now.getMonth() &&
-                        eventDate.getFullYear() === now.getFullYear();
+                    const isSameDay = eventDate.getTime() === now.getTime();
                     return {
                         ...event,
                         daysRemaining: isSameDay ? 0 : diffDays
                     };
-                })
-                .filter(event => event.daysRemaining >= 0)
+                }).filter(event => event.daysRemaining >= 0)
                 .map(event => ({
                     ...event,
                     daysRemaining: event.daysRemaining === 0 ? 'Today' : `${event.daysRemaining} days`
@@ -216,16 +243,18 @@ app.component('calendar', {
                     return parseInt(a.daysRemaining) - parseInt(b.daysRemaining);
                 })
                 .slice(0, 3);
+            // console.log(sortedDates);
+            return sortedDates;
         },
         currentMonthName() {
-            return this.currentDate.toLocaleString('default', { month: 'short' });
+            return this.currentViewingDate.toLocaleString('default', { month: 'short' });
         },
         currentYear() {
-            return this.currentDate.getFullYear();
+            return this.currentViewingDate.getFullYear();
         },
         calendarDays() {
-            const year = this.currentDate.getFullYear();
-            const month = this.currentDate.getMonth();
+            const year = this.currentViewingDate.getFullYear();
+            const month = this.currentViewingDate.getMonth();
             const firstDay = new Date(year, month, 1).getDay();
             const lastDate = new Date(year, month + 1, 0).getDate();
             const prevMonthLastDate = new Date(year, month, 0).getDate();
@@ -285,18 +314,29 @@ app.component('calendar', {
             }
 
             const date = new Date(this.newDate.date);
+            const endDate = new Date(this.newDate.endDate).getTime();
+
             const newSpecialDate = {
                 name: this.newDate.name,
                 month: date.getMonth() + 1,
                 day: date.getDate(),
                 isLunar: this.newDate.isLunar,
                 isRecurring: this.newDate.isRecurring,
-                isAnniversary: false,
+                isAnniversary: false, // Anniverary will not change
                 category: this.newDate.category
             };
-            if (this.newDate.isRecurring) {
+
+            if (!this.newDate.isRecurring) {
                 newSpecialDate['year'] = date.getFullYear();
             }
+
+            // if (date != endDate) {
+
+
+            //     newSpecialDate['endDate'] = endDate;
+            // }
+
+
             try {
                 const response = await fetch(url + 'createDate', {
                     method: 'POST',
@@ -327,23 +367,30 @@ app.component('calendar', {
         toStringDate(date) {
             return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
         },
-        getLunarDate({ year, month, day }) {
+        getSolarFromLunar({ year, month, day }) {
             this.lunarCalendar.setLunarDate(year, month, day, true);
             const solar = this.lunarCalendar.getSolarCalendar();
             return this.toStringDate(solar);
         },
-        formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('en-US', {
+        formatDate(event) {
+            let year;
+            if (event.isRecurring) {
+                year = new Date().getFullYear();
+            } else {
+                year = event.year;
+            }
+            const date = new Date(year, event.month - 1, event.day);
+            return date.toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
         },
         previousMonth() {
-            this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
+            this.currentViewingDate = new Date(this.currentViewingDate.getFullYear(), this.currentViewingDate.getMonth() - 1, 1);
         },
         nextMonth() {
-            this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
+            this.currentViewingDate = new Date(this.currentViewingDate.getFullYear(), this.currentViewingDate.getMonth() + 1, 1);
         },
         isToday(date) {
             const today = new Date();
@@ -375,14 +422,20 @@ app.component('calendar', {
             const events = this.getEventsForDate(date);
             return events.map(event => event.name);
         },
-        jumpToDate(dateString) {
-            const date = new Date(dateString);
-            this.currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        jumpToDate(event) {
+            let year;
+            if (event.isRecurring) {
+                year = new Date().getFullYear();
+            } else {
+                year = event.year;
+            }
+            const date = new Date(year, event.month - 1, event.day);
+            this.currentViewingDate = new Date(date.getFullYear(), date.getMonth(), 1);
             this.selectedDate = date;
         },
         jumpToToday() {
             const today = new Date();
-            this.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            this.currentViewingDate = new Date(today.getFullYear(), today.getMonth(), 1);
             this.selectedDate = today;
         },
         getOrdinalSuffix(number) {
@@ -396,7 +449,7 @@ app.component('calendar', {
             }
 
             try {
-                console.log(event.id);
+                // console.log(event.id);
                 const response = await fetch(url + 'deleteDate', {
                     method: 'POST',
                     headers: {
