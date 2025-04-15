@@ -1,5 +1,5 @@
-// const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
-const url = 'http://localhost:8000/calendar/';
+const url = 'https://eunjibackend-feg2fwcahycuf3hj.westus-01.azurewebsites.net/calendar/';
+// const url = 'http://localhost:8000/calendar/';
 
 app.component('calendar', {
     template:
@@ -25,7 +25,7 @@ app.component('calendar', {
                             <div class="field">
                                 <label class="label">날짜 끝</label>
                                 <div class="control">
-                                    <input type="date" v-model="newDate.endDate" class="input" >
+                                    <input type="date" v-model="newDate.endDate" class="input">
                                 </div>
                             </div>
                             <div class="field">
