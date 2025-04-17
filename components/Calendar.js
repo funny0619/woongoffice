@@ -125,7 +125,7 @@ app.component('calendar', {
                                 {{ event.name }}
                                 <button @click.stop="deleteDate(event)" class="button is-small is-transparent ml-2 mr-0" id="delete-event-button">
                                 <span class="icon is-small">
-                                <img src="./assets/images/remove.png" alt="delete" style="width: 12px; height: 12px;">
+                                <img src="./assets/images/remove.png" alt="delete" style="width: 10px; height: 10px;">
                                 </span>
                             </button>
                             </div>
