@@ -121,8 +121,13 @@ app.component('calendar', {
                         {{ day.day }}
                         <div v-if="hasEvent(day.date)" class="event-dot"></div>
                         <div v-if="isSelected(day.date) && hasEvent(day.date)" class="tooltip">
-                            <div v-for="(eventName, index) in getEventName(day.date)" :key="index" class="tooltip-item">
-                                {{ eventName }}
+                            <div v-for="(event, index) in getEvents(day.date)" :key="index" class="tooltip-item">
+                                {{ event.name }}
+                                <button @click.stop="deleteDate(event)" class="button is-small is-transparent ml-2 mr-0" id="delete-event-button">
+                                <span class="icon is-small">
+                                <img src="./assets/images/remove.png" alt="delete" style="width: 12px; height: 12px;">
+                                </span>
+                            </button>
                             </div>
                         </div>
                     </div>
@@ -178,33 +183,44 @@ app.component('calendar', {
             const year = this.currentViewingDate.getFullYear();
             // console.log(this.specialDates);
             return this.specialDates.map(event => {
-                if (event.isRecurring) {
-                    if (event.isLunar) {
-                        return {
-                            id: event.id,
-                            name: event.name,
-                            date: this.getSolarFromLunar({ year, month: event.month, day: event.day }),
-                            category: event.category,
-                            isRecurring: event.isRecurring,
-                        };
-                    } else {
-                        const date = this.toStringDate({ year, month: event.month, day: event.day })
-                        const name = event.isAnniversary ? `Our ${year - 2024 + 1}${this.getOrdinalSuffix(year - 2024 + 1)} Anniversary` : event.name
-                        return {
-                            id: event.id,
-                            name: name,
-                            date: date,
-                            category: event.category,
-                            isRecurring: event.isRecurring,
-                        };
-                    }
+
+
+
+                const { id, name: eventName, category, isRecurring, isLunar, isAnniversary, month, day } = event;
+                const eventYear = isRecurring ? year : event.year;
+                // if isGRoup is false or undefined, then it is a single event
+                const isGroup = event.isGroup || false;
+                const dateParams = { year: eventYear, month, day };
+
+                // Determine the date string based on lunar/solar calendar
+                const date = isLunar
+                    ? this.getSolarFromLunar(dateParams)
+                    : this.toStringDate(dateParams);
+
+                // Calculate anniversary name if needed
+                const name = isAnniversary && !isLunar
+                    ? `Our ${year - 2024 + 1}${this.getOrdinalSuffix(year - 2024 + 1)} Anniversary`
+                    : eventName;
+
+                if (isGroup) {
+                    const groupId = event.groupId;
+                    return {
+                        id,
+                        name,
+                        date,
+                        category,
+                        isRecurring,
+                        isGroup,
+                        groupId
+                    };
                 } else {
                     return {
-                        id: event.id,
-                        name: event.name,
-                        date: this.toStringDate({ year: event.year, month: event.month, day: event.day }),
-                        category: event.category,
-                        isRecurring: event.isRecurring,
+                        id,
+                        name,
+                        date,
+                        category,
+                        isRecurring,
+                        isGroup,
                     };
                 }
             });
@@ -493,6 +509,7 @@ app.component('calendar', {
             return this.getEventsForDate(date).length > 0;
         },
         getEventsForDate(date) {
+            // console.log(this.processedSpecialDates);
             return this.processedSpecialDates.filter(event => {
                 const eventDate = new Date(event.date);
                 return date.getDate() === eventDate.getDate() &&
@@ -500,9 +517,10 @@ app.component('calendar', {
                     date.getFullYear() === eventDate.getFullYear();
             });
         },
-        getEventName(date) {
+        getEvents(date) {
             const events = this.getEventsForDate(date);
-            return events.map(event => event.name);
+            // console.log(events);
+            return events;
         },
         jumpToDate(event) {
             let year;
@@ -527,12 +545,11 @@ app.component('calendar', {
         },
         async deleteDate(event) {
             // Todo add event name
-            if (!confirm('진짜 지우꼬양~?')) {
+            if (!confirm(`"${event.name}" 진짜 지우꼬양~?`)) {
                 return;
             }
 
             try {
-                console.log(event);
                 // console.log(event.id);
                 if (event.isGroup) {
                     const response = await fetch(url + 'deleteDate', {
